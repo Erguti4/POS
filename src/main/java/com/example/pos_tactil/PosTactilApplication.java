@@ -1,0 +1,13 @@
+package com.example.pos_tactil;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PosTactilApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PosTactilApplication.class, args);
+    }
+
+}

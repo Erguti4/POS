@@ -1,0 +1,16 @@
+package com.example.pos_tactil.config;
+
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.Oracle12cDialect;
+
+public class SQLiteDialect extends Dialect {
+
+    public SQLiteDialect() {
+        super();
+    }
+
+    @Override
+    public String getTableTypeString() {
+        return " WITHOUT ROWID"; // SQLite especifica esta propiedad para las tablas
+    }
+}
