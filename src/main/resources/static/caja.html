@@ -80,7 +80,7 @@
 
         <!-- Acciones -->
         <div class="d-flex justify-content-between mt-5">
-            <button class="btn btn-secondary btn-lg" onclick="cancelarFactura()">Cancelar</button>
+            <button class="btn btn-secondary btn-lg" onclick="cerrarCaja()">Cerrar Caja</button>
             <button class="btn btn-success btn-lg" onclick="finalizarFactura()">Finalizar</button>
         </div>
     </div>
@@ -226,23 +226,50 @@
         actualizarFactura();
     }
 
+    let dineroCajaActiva = 0;
+
+    function sumarDineroCajaActiva(monto) {
+        dineroCajaActiva += monto;
+    }
+
+
     function finalizarFactura() {
         if (productos.length === 0) {
             alert("No hay productos en la factura.");
             return;
         }
 
-        alert("Factura finalizada con éxito.");
-        productos = []; // Limpiar los productos de la factura
-        actualizarFactura(); // Actualizar la vista de la factura
+        // Guardar dinero acumulado en la caja activa
+        const totalFactura = productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+        sumarDineroCajaActiva(totalFactura);
+
+        // Limpiar productos de la factura
+        productos = [];
+        actualizarFactura(); // Actualizar vista de factura
     }
 
-    function cancelarFactura() {
-        if (confirm("¿Estás seguro de cancelar la factura actual?")) {
-            productos = []; // Limpiar los productos de la factura
-            actualizarFactura(); // Actualizar la vista de la factura
-        }
+
+    function cerrarCaja() {
+        const totalCaja = dineroCajaActiva.toFixed(2);
+
+        fetch(`/api/caja/cerrar?totalVentas=${totalCaja}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Caja cerrada correctamente.");
+                    dineroCajaActiva = 0; // Reinicia el acumulado tras cerrar
+                    window.location.href = "/"; // Redirigir a la página inicial
+                } else {
+                    alert("Error al cerrar la caja.");
+                }
+            })
+            .catch(err => {
+                console.error("Error al cerrar la caja:", err);
+                alert("Error de red al cerrar la caja.");
+            });
     }
+
 </script>
 
 </body>
