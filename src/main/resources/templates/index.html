@@ -16,7 +16,7 @@
 
     <style>
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(to bottom right, #ffe0b2, #fefefe); /* beige medio a blanco */
             font-size: 1.3rem;
         }
 
@@ -24,11 +24,47 @@
             font-weight: 700;
         }
 
-        .table td, .table th {
-            font-size: 1.1rem;
-            vertical-align: middle;
-            padding: 1rem;
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+
+        .table thead th {
+            background-color: #ffb74d; /* tono naranja suave */
+            color: #212529;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #fff3e0;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #ffe0b2;
+        }
+
+        .table tbody tr:hover {
+            background-color: #ffe0b2;
+        }
+
+        .table td {
+            text-align: center;
+            font-size: 1.1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+
 
         .panel-boton {
             display: inline-block;
@@ -51,10 +87,6 @@
             color: white;
         }
 
-        .table th {
-            background-color: #e9ecef;
-        }
-
         .cerrar-caja-container {
             display: flex;
             justify-content: center;
@@ -70,12 +102,30 @@
 <body>
 <div class="container py-5">
     <!-- Navbar -->
-    <nav class="navbar navbar-light bg-white mb-4">
-        <a class="navbar-brand fs-3 fw-bold" href="#">POS Táctil</a>
+    <nav class="navbar navbar-expand-lg shadow-sm bg-light px-4 py-3 rounded mb-4">
+        <a class="navbar-brand d-flex align-items-center fs-2 fw-bold text-success" href="#">
+            <i class="bi bi-cash-register me-2"></i> POS Táctil
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+                <!-- Otras opciones de navegación aquí -->
+            </ul>
+
+            <!-- Botón para personalizar ticket -->
+            <a href="personalizar-ticket.html" class="btn btn-warning ms-3 my-2 my-lg-0">
+                <i class="bi bi-paint-bucket me-2"></i> Personalizar Ticket
+            </a>
+        </div>
     </nav>
 
+
     <!-- Encabezado -->
-    <div class="text-center animate__animated animate__fadeIn">
+    <div class="text-center animate__animated animate__fadeIn animate__delay-1s">
         <h1 class="display-3 mb-3">Bienvenido</h1>
         <p class="lead fs-4">Gestiona tus ventas con una interfaz adaptada para pantallas táctiles.</p>
     </div>
@@ -99,15 +149,15 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-3">
-            <button id="prevPagina" class="btn btn-outline-secondary me-2">←</button>
-            <button id="sigPagina" class="btn btn-outline-secondary">→</button>
+            <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-3">←</button>
+            <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-3">→</button>
         </div>
     </div>
 
     <!-- Botones Abrir y Cerrar Caja -->
     <div class="cerrar-caja-container">
-        <button id="abrirCaja" class="panel-boton">Abrir Caja</button>
-        <button id="cerrarCaja" class="panel-boton">Cerrar Caja</button>
+        <button id="abrirCaja" class="panel-boton animate__animated">Abrir Caja</button>
+        <button id="cerrarCaja" class="panel-boton animate__animated">Cerrar Caja</button>
     </div>
 </div>
 
@@ -204,8 +254,12 @@
         const fin = inicio + cajasPorPagina;
         const cajasPagina = todasLasCajas.slice(inicio, fin);
 
-        cajasPagina.forEach(caja => {
+        cajasPagina.forEach((caja, index) => {
             const row = document.createElement("tr");
+
+            // Añadir clase de animación a cada fila con retraso
+            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index}s`);
+
 
             const id = caja.id.toString().padStart(4, '0');
             const fechaApertura = new Date(caja.fechaApertura).toLocaleString();
@@ -217,11 +271,11 @@
                 : "—";
 
             row.innerHTML = `
-                <td>${id}</td>
-                <td>${fechaApertura}</td>
-                <td>${fechaCierre}</td>
-                <td>${total}</td>
-            `;
+            <td>${id}</td>
+            <td>${fechaApertura}</td>
+            <td>${fechaCierre}</td>
+            <td>${total}</td>
+        `;
             tabla.appendChild(row);
 
             if (caja.estado === 'ABIERTA') {

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalizar Ticket</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<style>
+    body {
+        background: linear-gradient(to right, #fff3e0, #ffffff);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    h2 {
+        font-weight: bold;
+        color: #d84315;
+        margin-bottom: 2rem;
+    }
+
+    form {
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eee;
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    input.form-control,
+    select.form-control,
+    textarea.form-control {
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    input.form-control:focus,
+    select.form-control:focus,
+    textarea.form-control:focus {
+        border-color: #ffa726;
+        box-shadow: 0 0 5px rgba(255, 167, 38, 0.5);
+    }
+
+    button.btn-primary {
+        background-color: #ff7043;
+        border-color: #ff7043;
+        font-size: 1.1rem;
+        padding: 0.75rem 2rem;
+        border-radius: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    button.btn-primary:hover {
+        background-color: #f4511e;
+        border-color: #f4511e;
+    }
+
+    button.btn-secondary {
+        background-color: #b0bec5;
+        border-color: #b0bec5;
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+        border-radius: 0.8rem;
+    }
+
+    button.btn-secondary:hover {
+        background-color: #90a4ae;
+        border-color: #90a4ae;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    .mt-5 a.btn-secondary {
+        margin-top: 1rem;
+        background-color: #eeeeee;
+        border: 1px solid #ccc;
+        color: #333;
+    }
+
+    .mt-5 a.btn-secondary:hover {
+        background-color: #e0e0e0;
+        color: #111;
+    }
+
+    /* Estilo para la previsualización del ticket */
+    .ticket-preview {
+        margin-top: 3rem;
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .ticket-logo {
+        max-width: 100px;
+        max-height: 100px;
+        margin-bottom: 1rem;
+    }
+
+    .ticket-text {
+        font-size: 16px;
+        margin-top: 1rem;
+    }
+
+</style>
+<body>
+<!-- Contenedor para la previsualización del ticket -->
+<div class="ticket-preview" id="ticketPreview">
+    <img id="ticketLogo" class="ticket-logo" src="" alt="Logo">
+    <div id="ticketText" class="ticket-text">Texto del Ticket</div>
+</div>
+<div class="container mt-5">
+    <h2 class="text-center">Personalizar Ticket</h2>
+
+    <form id="personalizarForm" class="mt-4">
+
+        <div class="form-group">
+            <label for="logoUrl">Logo (URL o Cargar Imagen):</label>
+            <input type="text" class="form-control" id="logoUrl" placeholder="Ingrese la URL del logo">
+            <button type="button" class="btn btn-secondary mt-2" id="uploadLogoBtn">Cargar Imagen</button>
+            <input type="file" id="logoFile" class="d-none" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label for="fontSize">Tamaño de la Fuente:</label>
+            <input type="number" class="form-control" id="fontSize" placeholder="Ingrese el tamaño de la fuente" min="8" max="24">
+        </div>
+
+        <div class="form-group">
+            <label for="fontType">Tipo de Fuente:</label>
+            <select class="form-control" id="fontType">
+                <option value="Courier">Courier</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+            </select>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="showDate">
+            <label class="form-check-label" for="showDate">Mostrar Fecha</label>
+        </div>
+
+        <div class="form-group">
+            <label for="customText">Texto Personalizado:</label>
+            <textarea class="form-control" id="customText" rows="3" placeholder="Ingrese texto personalizado para el ticket"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Personalización</button>
+    </form>
+
+
+    <div class="mt-5">
+        <a href="/" class="btn btn-secondary">Volver a la tienda</a>
+    </div>
+
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Obtener la personalización del ticket si ya existe
+        fetch('/ticket-personalizado')
+            .then(response => response.json())
+            .then(data => {
+                // Rellenar los campos con los datos actuales de personalización
+                document.getElementById('logoUrl').value = data.logoUrl;
+                document.getElementById('fontSize').value = data.fontSize;
+                document.getElementById('fontType').value = data.fontType;
+                document.getElementById('showDate').checked = data.showDate;
+                document.getElementById('customText').value = data.customText;
+
+                // Actualizar la previsualización
+                updatePreview(data);
+            })
+            .catch(error => {
+                console.error('Error al cargar la personalización del ticket:', error);
+            });
+
+        // Manejo del formulario
+        document.getElementById('personalizarForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const logoUrl = document.getElementById('logoUrl').value;
+            const fontSize = document.getElementById('fontSize').value;
+            const fontType = document.getElementById('fontType').value;
+            const showDate = document.getElementById('showDate').checked;
+            const customText = document.getElementById('customText').value;
+
+            const ticketData = {
+                logoUrl,
+                fontSize: parseInt(fontSize),
+                fontType,
+                showDate,
+                customText
+            };
+
+            // Enviar los cambios al backend
+            fetch('/ticket-personalizado', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ticketData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('¡Ticket personalizado guardado correctamente!');
+                    updatePreview(ticketData); // Actualizar previsualización
+                })
+                .catch(error => {
+                    console.error('Error al guardar la personalización:', error);
+                    alert('Hubo un error al guardar la personalización');
+                });
+        });
+
+        // Manejo de la carga de imagen
+        document.getElementById('uploadLogoBtn').addEventListener('click', () => {
+            document.getElementById('logoFile').click();
+        });
+
+        // Procesar la imagen cargada
+        document.getElementById('logoFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Mostrar la URL de la imagen en el campo logoUrl
+                    document.getElementById('logoUrl').value = e.target.result;
+                    updatePreview(); // Actualizar previsualización
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // Función para actualizar la previsualización del ticket
+    function updatePreview(data = null) {
+        const logoUrl = data ? data.logoUrl : document.getElementById('logoUrl').value;
+        const fontSize = data ? data.fontSize : document.getElementById('fontSize').value;
+        const fontType = data ? data.fontType : document.getElementById('fontType').value;
+        const showDate = data ? data.showDate : document.getElementById('showDate').checked;
+        const customText = data ? data.customText : document.getElementById('customText').value;
+
+        // Actualizar el logo
+        document.getElementById('ticketLogo').src = logoUrl || '';
+
+        // Actualizar el texto del ticket
+        let ticketText = customText || 'Texto del Ticket';
+        if (showDate) {
+            ticketText += `\n${new Date().toLocaleString()}`;
+        }
+
+        const ticketTextElement = document.getElementById('ticketText');
+        ticketTextElement.textContent = ticketText;
+
+        // Cambiar el tamaño de la fuente y tipo
+        ticketTextElement.style.fontSize = fontSize + 'px';
+        ticketTextElement.style.fontFamily = fontType;
+    }
+</script>
+</body>
+</html>

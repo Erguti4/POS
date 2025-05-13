@@ -16,32 +16,74 @@
 
     <style>
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(to bottom right, #fff3e0, #ffffff); /* fondo suave */
             font-size: 1.3rem;
         }
 
-        .btn-lg {
-            padding: 1rem 2rem;
-            font-size: 1.5rem;
-            border-radius: 1rem;
+        .factura-panel {
+            background-color: #fff;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
         }
 
-        .factura-panel {
-            background-color: #ffffff;
+        .table {
+            margin-top: 1.5rem;
             border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background-color: #ffb74d;
+            color: #212529;
+            font-size: 1.1rem;
+            text-align: center;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #fff3e0;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #ffe0b2;
+        }
+
+        .table td {
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .table tbody tr:hover {
+            background-color: #ffd180;
+            transition: background-color 0.3s ease;
         }
 
         .total {
             font-size: 2rem;
             font-weight: bold;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             text-align: right;
+            color: #d84315;
         }
 
-        .modal-content {
-            padding: 1.5rem;
+        .btn-confirmar {
+            background-color: #ff7043;
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.4rem;
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #f4511e;
+            color: white;
         }
 
         .top-right-button {
@@ -49,12 +91,12 @@
             top: 20px;
             right: 20px;
         }
+
     </style>
 </head>
 <body>
 <div class="container py-5">
-    <!-- Botón para personalizar ticket -->
-    <a href="/personalizar-ticket" class="btn btn-warning top-right-button">Personalizar Ticket</a>
+
 
     <!-- Encabezado -->
     <div class="text-center mb-4 animate__animated animate__fadeInDown">
@@ -239,14 +281,136 @@
             return;
         }
 
-        // Guardar dinero acumulado en la caja activa
+        // Calcular total
         const totalFactura = productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+
+        // 1. Generar ticket
+        generarTicket(productos, totalFactura);
+
+        // 2. Sumar al total de la caja
         sumarDineroCajaActiva(totalFactura);
 
-        // Limpiar productos de la factura
+        // 3. Limpiar productos y actualizar vista
         productos = [];
-        actualizarFactura(); // Actualizar vista de factura
+        actualizarFactura();
     }
+
+
+    async function generarTicket(productos, totalFactura) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const personalizacion = await fetch('/ticket-personalizado')
+            .then(response => response.json())
+            .catch(error => {
+                console.error('Error al cargar la personalización:', error);
+                return {};
+            });
+
+        const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
+
+        const fuente = fontType || "Helvetica";
+        const tamanoFuente = fontSize || 12;
+        const anchoPagina = doc.internal.pageSize.getWidth();
+        let y = 10;
+
+        // Configuración de fuente y tamaño
+        doc.setFont(fuente, "normal");
+        doc.setFontSize(tamanoFuente);
+
+        // Logo centrado y elegante
+        if (logoUrl) {
+            try {
+                const logoImg = await loadImage(logoUrl);
+                const logoAncho = 60;
+                const logoAlto = 60;
+                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
+                y += logoAlto + 10;
+            } catch (error) {
+                console.error('Error al cargar el logo:', error);
+            }
+        }
+
+        // Título con estilo y separación adecuada
+        doc.setFontSize(tamanoFuente + 2);
+        doc.setFont(undefined, "bold");
+        doc.text("TICKET DE COMPRA", anchoPagina / 2, y, { align: "center" });
+        y += 12;
+
+        // Fecha opcional
+        if (showDate) {
+            const fecha = new Date().toLocaleString();
+            doc.setFontSize(tamanoFuente - 1);
+            doc.setFont(undefined, "normal");
+            doc.text(`Fecha: ${fecha}`, 10, y);
+            y += 8;
+        }
+
+        // Cabecera de productos con diseño más limpio
+        doc.setFontSize(tamanoFuente + 1);
+        doc.setFont(undefined, "bold");
+        doc.text("Producto", 10, y);
+        doc.text("Cant.", 120, y);
+        doc.text("Total", 170, y);
+        doc.setFont(undefined, "normal");
+        y += 10;
+
+        // Detalle de los productos con formato mejorado
+        productos.forEach(prod => {
+            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
+            const cantidad = prod.cantidad.toString();
+            const precio = (prod.precio * prod.cantidad).toFixed(2);
+
+            doc.text(nombre, 10, y);
+            doc.text(cantidad, 120, y, { align: "right" });
+            doc.text(`$${precio}`, 170, y, { align: "right" });
+
+            y += 8;
+        });
+
+        // Espacio y total resaltado
+        y += 10;
+        doc.setFont(undefined, "bold");
+        doc.setFontSize(tamanoFuente + 2);
+        doc.text("TOTAL", 10, y);
+        doc.text(`$${totalFactura.toFixed(2)}`, 170, y, { align: "right" });
+        y += 12;
+
+        // Texto personalizado con un diseño más agradable
+        if (customText) {
+            const lineas = splitTextToLines(doc, customText, 180);
+            lineas.forEach(linea => {
+                doc.setFont(undefined, "italic");
+                doc.text(linea, anchoPagina / 2, y, { align: "center" });
+                y += 6;
+            });
+            y += 8;
+        }
+
+        // Agradecimiento en un estilo elegante
+        doc.setFontSize(tamanoFuente - 1);
+        doc.setFont(undefined, "italic");
+        doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
+
+        doc.autoPrint();
+        window.open(doc.output('bloburl'), '_blank');
+    }
+
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    function splitTextToLines(doc, text, maxWidth) {
+        return doc.splitTextToSize(text, maxWidth);
+    }
+
+
 
 
     function cerrarCaja() {
@@ -271,6 +435,7 @@
     }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
