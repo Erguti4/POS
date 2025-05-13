@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Productos</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"/>
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="/css/styles.css"/>
+
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #ffe0b2, #fefefe);
+            font-size: 1.3rem;
+        }
+
+        h1, h3 {
+            font-weight: 700;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead th {
+            background-color: #ffb74d;
+            color: #212529;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #fff3e0;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #ffe0b2;
+        }
+
+        .table tbody tr:hover {
+            background-color: #ffe0b2;
+        }
+
+        .table td {
+            text-align: center;
+            font-size: 1.1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow-sm bg-light px-4 py-3 rounded mb-4">
+        <a class="navbar-brand d-flex align-items-center fs-2 fw-bold text-success" href="#">
+            <i class="bi bi-cash-register me-2"></i> Productos
+        </a>
+    </nav>
+
+    <!-- Encabezado -->
+    <div class="text-center animate__animated animate__fadeIn animate__delay-1s">
+        <h1 class="display-3 mb-3">Gestión de Productos</h1>
+        <p class="lead fs-4">Visualiza y actualiza los productos registrados en la tienda.</p>
+    </div>
+
+    <!-- Productos -->
+    <div class="mt-5 animate__animated animate__fadeInUp">
+        <h3 class="mb-3">Lista de Productos</h3>
+        <div class="table-responsive">
+            <table class="table table-hover border">
+                <thead>
+                <tr>
+                    <th>Código de Barra</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody id="productosLista">
+                <!-- Se rellenará dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-3">
+        <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-3">←</button>
+        <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-3">→</button>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let productos = [];
+    let paginaActual = 0;
+    const productosPorPagina = 6;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch('/productos')
+            .then(response => response.json())
+            .then(data => {
+                productos = data; // Guardamos los productos
+                mostrarPagina(paginaActual);
+            })
+            .catch(err => {
+                console.error("Error al cargar productos:", err);
+            });
+
+        document.getElementById("prevPagina").addEventListener("click", () => {
+            if (paginaActual > 0) {
+                paginaActual--;
+                mostrarPagina(paginaActual);
+            }
+        });
+
+        document.getElementById("sigPagina").addEventListener("click", () => {
+            const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+            if (paginaActual < totalPaginas - 1) {
+                paginaActual++;
+                mostrarPagina(paginaActual);
+            }
+        });
+    });
+
+    function mostrarPagina(pagina) {
+        const tabla = document.getElementById("productosLista");
+        tabla.innerHTML = "";
+
+        const inicio = pagina * productosPorPagina;
+        const fin = inicio + productosPorPagina;
+        const productosPagina = productos.slice(inicio, fin);
+
+        productosPagina.forEach((producto, index) => {
+            const row = document.createElement("tr");
+
+            // Añadir clase de animación a cada fila con retraso
+            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index}s`);
+
+            row.innerHTML = `
+                <td>${producto.codigoBarra}</td>
+                <td><input type="text" value="${producto.nombre}" class="form-control" onchange="actualizarProducto('${producto.codigoBarra}', 'nombre', this.value)"/></td>
+                <td><input type="number" value="${producto.precio}" class="form-control" onchange="actualizarProducto('${producto.codigoBarra}', 'precio', this.value)"/></td>
+                <td>
+                    <button class="btn btn-info" onclick="guardarProducto('${producto.codigoBarra}')">Guardar</button>
+                    <button class="btn btn-danger" onclick="eliminarProducto('${producto.codigoBarra}')">Borrar</button>
+                </td>
+            `;
+            tabla.appendChild(row);
+        });
+    }
+
+    function actualizarProducto(codigoBarra, campo, valor) {
+        // Lógica para actualizar el producto en el frontend
+        const producto = productos.find(p => p.codigoBarra === codigoBarra);
+        if (producto) {
+            producto[campo] = valor;
+        }
+    }
+
+    function guardarProducto(codigoBarra) {
+        const producto = productos.find(p => p.codigoBarra === codigoBarra);
+        if (producto) {
+            fetch(`/productos/${codigoBarra}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(producto),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Producto actualizado");
+
+                })
+                .catch(err => {
+                    console.error("Error al guardar producto:", err);
+                });
+        }
+    }
+
+    function eliminarProducto(codigoBarra) {
+        if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+            fetch(`/productos/${codigoBarra}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Producto eliminado");
+                        // Actualiza la lista de productos
+                        productos = productos.filter(p => p.codigoBarra !== codigoBarra);
+                        mostrarPagina(paginaActual);
+                    } else {
+                        alert("Error al eliminar el producto.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error al eliminar producto:", err);
+                });
+        }
+    }
+
+</script>
+
+</body>
+</html>

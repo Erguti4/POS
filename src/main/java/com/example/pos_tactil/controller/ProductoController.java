@@ -38,4 +38,30 @@ public class ProductoController {
         }
         return productoService.guardarProducto(producto);
     }
+
+    // Eliminar un producto
+    @DeleteMapping("/{codigoBarra}")
+    public void eliminarProducto(@PathVariable String codigoBarra) {
+        Optional<Producto> producto = productoService.obtenerProductoPorCodigoBarra(codigoBarra);
+        if (producto.isPresent()) {
+            productoService.eliminarProducto(producto.get());
+        }
+    }
+
+
+
+
+    // Actualizar un producto
+    @PutMapping("/{codigoBarra}")
+    public Producto actualizarProducto(@PathVariable String codigoBarra, @RequestBody Producto producto) {
+        Optional<Producto> productoExistente = productoService.obtenerProductoPorCodigoBarra(codigoBarra);
+        if (productoExistente.isPresent()) {
+            Producto productoActualizado = productoExistente.get();
+            productoActualizado.setNombre(producto.getNombre());
+            productoActualizado.setPrecio(producto.getPrecio());
+            return productoService.guardarProducto(productoActualizado);
+        }
+        return null; // Retorna null si no se encuentra el producto
+    }
+
 }

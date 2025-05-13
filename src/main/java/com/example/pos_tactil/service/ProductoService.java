@@ -27,9 +27,17 @@ public class ProductoService {
         return productoRepository.findById(codigoBarra);
     }
 
+
+
     public List<Producto> findAll() {
         return productoRepository.findAll();
     }
+
+    public void eliminarProducto(Producto producto) {
+        // Lógica para eliminar el producto de la base de datos
+        productoRepository.delete(producto);
+    }
+
 
     // Otros métodos si es necesario...
 }

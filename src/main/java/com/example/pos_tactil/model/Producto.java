@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Entity
 @Data
 public class Producto {
@@ -22,6 +24,19 @@ public class Producto {
 
     public String getNombre() {
         return nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Producto producto = (Producto) o;
+        return Objects.equals(codigoBarra, producto.codigoBarra);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigoBarra, nombre, precio);
     }
 
     public void setNombre(String nombre) {
