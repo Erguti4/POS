@@ -2,7 +2,6 @@ package com.example.pos_tactil.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.Objects;
 

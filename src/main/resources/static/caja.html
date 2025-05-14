@@ -90,10 +90,18 @@
             <button class="btn btn-primary btn-lg" onclick="buscarProducto()">Agregar</button>
         </div>
 
+        <div class="row fw-bold border-bottom pb-2">
+            <div class="col-3">Nombre</div>
+            <div class="col-3">Cantidad</div>
+            <div class="col-2 text-center">Descuento (%)</div>
+            <div class="col-2 text-end">Importe</div>
+        </div>
+        
+        
         <div id="facturaItems" class="mt-3"></div>
 
         <!-- Total -->
-        <div class="total mt-4">Total: $<span id="totalFactura">0.00</span></div>
+        <div class="total mt-4">Total: <span id="totalFactura">0.00</span>€</div>
 
         <!-- Acciones -->
         <div class="d-flex justify-content-between mt-5">
@@ -206,42 +214,60 @@
     }
 
     function actualizarFactura() {
-        const contenedor = document.getElementById('facturaItems');
-        const totalElem = document.getElementById('totalFactura');
-        contenedor.innerHTML = ''; // Limpiar la lista de productos
+    const contenedor = document.getElementById('facturaItems');
+    const totalElem = document.getElementById('totalFactura');
+    contenedor.innerHTML = ''; // Limpiar la lista de productos
 
-        let total = 0;
+    let total = 0;
 
-        productos.forEach((producto, index) => {
-            const item = document.createElement('div');
-            item.classList.add('d-flex', 'justify-content-between', 'border-bottom', 'py-2');
-            item.innerHTML = `
-                <input type="text" value="${producto.nombre}" class="form-control" onblur="editarProducto(${index}, 'nombre', this.value)">
-                <input type="number" value="${producto.cantidad}" class="form-control w-25" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
-                <input type="number" value="${producto.precio}" class="form-control w-25" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
-                <span>$${(producto.precio * producto.cantidad).toFixed(2)}</span>
-            `;
-            contenedor.appendChild(item);
-            total += producto.precio * producto.cantidad;
-        });
+    productos.forEach((producto, index) => {
+        const descuento = producto.descuento || 0;
+        const precioConDescuento = producto.precio * (1 - descuento / 100);
+        const importe = precioConDescuento * producto.cantidad;
 
-        totalElem.textContent = total.toFixed(2); // Actualizar el total
+        const item = document.createElement('div');
+        item.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'border-bottom', 'py-2', 'gap-2');
+        item.innerHTML = `
+            <input type="text" value="${producto.nombre}" class="form-control" onblur="editarProducto(${index}, 'nombre', this.value)">
+            <input type="number" value="${producto.cantidad}" class="form-control w-15" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
+            <input type="number" value="${producto.descuento || ''}" placeholder="%" class="form-control w-15" min="0" max="100" onblur="editarProducto(${index}, 'descuento', this.value)">
+            <input type="number" value="${producto.precio}" class="form-control w-15" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
+            <span class="text-end">${importe.toFixed(2)}€</span>
+            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
+        `;
+        contenedor.appendChild(item);
+        total += importe;
+    });
+
+    totalElem.textContent = total.toFixed(2); // Actualizar el total
     }
 
-    function editarProducto(index, campo, valor) {
-        if (campo === 'cantidad') {
-            valor = parseInt(valor);
-            if (isNaN(valor) || valor <= 0) return;
-            productos[index].cantidad = valor;
-        } else if (campo === 'precio') {
-            valor = parseFloat(valor);
-            if (isNaN(valor) || valor < 0) return;
-            productos[index].precio = valor;
-        } else if (campo === 'nombre') {
-            productos[index].nombre = valor;
-        }
-        actualizarFactura();
+
+function editarProducto(index, campo, valor) {
+    if (campo === 'cantidad') {
+        valor = parseInt(valor);
+        if (isNaN(valor) || valor <= 0) return;
+        productos[index].cantidad = valor;
+    } else if (campo === 'precio') {
+        valor = parseFloat(valor);
+        if (isNaN(valor) || valor < 0) return;
+        productos[index].precio = valor;
+    } else if (campo === 'descuento') {
+        valor = parseFloat(valor);
+        if (isNaN(valor) || valor < 0 || valor > 100) return;
+        productos[index].descuento = valor;
+    } else if (campo === 'nombre') {
+        productos[index].nombre = valor;
     }
+    actualizarFactura();
+    }
+
+    function eliminarProducto(index) {
+    productos.splice(index, 1); // Quita el producto del array
+    actualizarFactura();        // Vuelve a renderizar la factura
+    }
+
+
 
     let dineroCajaActiva = 0;
 
@@ -272,104 +298,120 @@
 
 
     async function generarTicket(productos, totalFactura) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-        const personalizacion = await fetch('/ticket-personalizado')
-            .then(response => response.json())
-            .catch(error => {
-                console.error('Error al cargar la personalización:', error);
-                return {};
-            });
-
-        const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
-
-        const fuente = fontType || "Helvetica";
-        const tamanoFuente = fontSize || 12;
-        const anchoPagina = doc.internal.pageSize.getWidth();
-        let y = 10;
-
-        // Configuración de fuente y tamaño
-        doc.setFont(fuente, "normal");
-        doc.setFontSize(tamanoFuente);
-
-        // Logo centrado y elegante
-        if (logoUrl) {
-            try {
-                const logoImg = await loadImage(logoUrl);
-                const logoAncho = 60;
-                const logoAlto = 60;
-                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
-                y += logoAlto + 10;
-            } catch (error) {
-                console.error('Error al cargar el logo:', error);
-            }
-        }
-
-        // Título con estilo y separación adecuada
-        doc.setFontSize(tamanoFuente + 2);
-        doc.setFont(undefined, "bold");
-        doc.text("TICKET DE COMPRA", anchoPagina / 2, y, { align: "center" });
-        y += 12;
-
-        // Fecha opcional
-        if (showDate) {
-            const fecha = new Date().toLocaleString();
-            doc.setFontSize(tamanoFuente - 1);
-            doc.setFont(undefined, "normal");
-            doc.text(`Fecha: ${fecha}`, 10, y);
-            y += 8;
-        }
-
-        // Cabecera de productos con diseño más limpio
-        doc.setFontSize(tamanoFuente + 1);
-        doc.setFont(undefined, "bold");
-        doc.text("Producto", 10, y);
-        doc.text("Cant.", 120, y);
-        doc.text("Total", 170, y);
-        doc.setFont(undefined, "normal");
-        y += 10;
-
-        // Detalle de los productos con formato mejorado
-        productos.forEach(prod => {
-            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
-            const cantidad = prod.cantidad.toString();
-            const precio = (prod.precio * prod.cantidad).toFixed(2);
-
-            doc.text(nombre, 10, y);
-            doc.text(cantidad, 120, y, { align: "right" });
-            doc.text(`$${precio}`, 170, y, { align: "right" });
-
-            y += 8;
+    const personalizacion = await fetch('/ticket-personalizado')
+        .then(response => response.json())
+        .catch(error => {
+            console.error('Error al cargar la personalización:', error);
+            return {};
         });
 
-        // Espacio y total resaltado
-        y += 10;
-        doc.setFont(undefined, "bold");
-        doc.setFontSize(tamanoFuente + 2);
-        doc.text("TOTAL", 10, y);
-        doc.text(`$${totalFactura.toFixed(2)}`, 170, y, { align: "right" });
-        y += 12;
+    const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
 
-        // Texto personalizado con un diseño más agradable
-        if (customText) {
-            const lineas = splitTextToLines(doc, customText, 180);
-            lineas.forEach(linea => {
-                doc.setFont(undefined, "italic");
-                doc.text(linea, anchoPagina / 2, y, { align: "center" });
-                y += 6;
-            });
-            y += 8;
+    const fuente = fontType || "Helvetica";
+    const tamanoFuente = fontSize || 12;
+    const anchoPagina = doc.internal.pageSize.getWidth();
+    let y = 10;
+
+    doc.setFont(fuente, "normal");
+    doc.setFontSize(tamanoFuente);
+
+    // Logo
+    if (logoUrl) {
+        try {
+            const logoImg = await loadImage(logoUrl);
+            const logoAncho = 60;
+            const logoAlto = 60;
+            doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
+            y += logoAlto + 10;
+        } catch (error) {
+            console.error('Error al cargar el logo:', error);
         }
-
-        // Agradecimiento en un estilo elegante
-        doc.setFontSize(tamanoFuente - 1);
-        doc.setFont(undefined, "italic");
-        doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
-
-        doc.autoPrint();
-        window.open(doc.output('bloburl'), '_blank');
     }
+
+    // Texto personalizado
+    if (customText) {
+        const lineas = splitTextToLines(doc, customText, 180);
+        lineas.forEach(linea => {
+            doc.setFont(undefined, "italic");
+            doc.text(linea, anchoPagina / 2, y, { align: "center" });
+            y += 6;
+        });
+        y += 8;
+    }
+
+    // Título
+    doc.setFontSize(tamanoFuente + 2);
+    doc.setFont(undefined, "bold");
+    doc.text("FACTURA SIMPLIFICADA", anchoPagina / 2, y, { align: "center" });
+    y += 12;
+
+    // Fecha
+    if (showDate) {
+        const fecha = new Date().toLocaleString();
+        doc.setFontSize(tamanoFuente - 1);
+        doc.setFont(undefined, "normal");
+        doc.text(`Fecha: ${fecha}`, 10, y);
+        y += 8;
+    }
+
+    // Encabezados con "Descuento"
+    doc.setFontSize(tamanoFuente + 1);
+    doc.setFont(undefined, "bold");
+    doc.text("Producto", 10, y);
+    doc.text("Cant.", 90, y);
+    doc.text("Desc.", 120, y);
+    doc.text("Total", 170, y);
+    doc.setFont(undefined, "normal");
+    y += 10;
+
+    // Detalle productos
+    let totalConDescuento = 0; // Variable para acumular el total con descuento
+    productos.forEach(prod => {
+        const descuento = prod.descuento || 0;
+        const precioConDescuento = prod.precio * (1 - descuento / 100);
+        const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
+        totalConDescuento += parseFloat(totalProductoConDescuento); // Sumamos el total con descuento
+
+        const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
+        const cantidad = prod.cantidad.toString();
+
+        // Líneas arriba y abajo
+        doc.setLineWidth(0.5);
+        doc.line(10, y - 2, anchoPagina - 10, y - 2); // Línea arriba
+        y += 4;
+
+        doc.text(nombre, 10, y);
+        doc.text(cantidad, 100, y, { align: "right" });
+        doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
+        doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
+        y += 4;
+
+        // Línea debajo del producto
+        doc.line(10, y , anchoPagina - 10, y); // Línea abajo
+        y += 3; // Espaciado después de la línea
+    });
+
+    // Total con descuentos aplicados
+    y += 10;
+    doc.setFont(undefined, "bold");
+    doc.setFontSize(tamanoFuente + 2);
+    doc.text("TOTAL", 10, y);
+    doc.text(`${totalConDescuento.toFixed(2)}€`, 190, y, { align: "right" });
+    y += 12;
+
+    // Agradecimiento
+    doc.setFontSize(tamanoFuente - 1);
+    doc.setFont(undefined, "italic");
+    doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
+
+    doc.autoPrint();
+    window.open(doc.output('bloburl'), '_blank');
+    }
+
+
 
     function loadImage(url) {
         return new Promise((resolve, reject) => {
@@ -408,7 +450,6 @@
                 alert("Error de red al cerrar la caja.");
             });
     }
-
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
