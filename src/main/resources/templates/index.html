@@ -125,6 +125,11 @@
             <a href="productos.html" class="btn btn-info ms-3 my-2 my-lg-0">
                 <i class="bi bi-boxes me-2"></i> Productos
             </a>
+
+            <!-- Botón para ver todas las facturas -->
+            <a href="ver-facturas.html" class="btn btn-primary ms-3 my-2 my-lg-0">
+                <i class="bi bi-file-earmark-text me-2"></i> Ver Facturas
+            </a>
         </div>
     </nav>
 
@@ -273,7 +278,7 @@
                 ? new Date(caja.fechaCierre).toLocaleString()
                 : "—";
             const total = caja.totalVentas != null
-                ? `$${parseFloat(caja.totalVentas).toFixed(2)}`
+                ? `${parseFloat(caja.totalVentas).toFixed(2)}€`
                 : "—";
 
             row.innerHTML = `

@@ -79,6 +79,12 @@
         <p class="lead">Escanea productos o ingrésalos manualmente.</p>
     </div>
 
+    <!-- Número de Factura -->
+    <div class="text-center mb-4 animate__animated animate__fadeInUp">
+        <label for="numeroFactura" class="h5">Factura #</label>
+        <input type="text" id="numeroFactura" class="form-control d-inline-block w-auto text-center" readonly style="font-size: 1.5rem; font-weight: bold; background-color: #f8f9fa;">
+    </div>
+
     <!-- Panel de Factura -->
     <div class="factura-panel animate__animated animate__fadeIn">
         <h3>Productos en la Factura</h3>
@@ -146,6 +152,26 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    let numeroFactura = 0;  // Variable para almacenar el número de factura actual
+
+    function obtenerUltimoNumeroFactura() {
+        fetch('/api/factura/ultimo-id')  // Asegúrate de que esta URL devuelva el último número de factura
+            .then(response => response.json())
+            .then(data => {
+                numeroFactura = data.ultimoId + 1;  // Suponiendo que `ultimoId` es el número más alto
+                document.getElementById('numeroFactura').value = numeroFactura;  // Actualizar el campo de factura
+            })
+            .catch(error => {
+                console.error('Error al obtener el último número de factura:', error);
+                numeroFactura = 1;  // Si hay error, empezamos desde 1
+                document.getElementById('numeroFactura').value = numeroFactura;  // Actualizar el campo de factura
+            });
+    }
+
+    // Llamamos a la función para obtener el último ID al cargar la página
+    window.onload = function() {
+        obtenerUltimoNumeroFactura();
+    }
     let productos = [];
 
     function buscarProducto() {
@@ -267,8 +293,6 @@ function editarProducto(index, campo, valor) {
     actualizarFactura();        // Vuelve a renderizar la factura
     }
 
-
-
     let dineroCajaActiva = 0;
 
     function sumarDineroCajaActiva(monto) {
@@ -283,7 +307,12 @@ function editarProducto(index, campo, valor) {
         }
 
         // Calcular total
-        const totalFactura = productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+        const totalFactura = productos.reduce((total, producto) => {
+            const precio = parseFloat(producto.precio) || 0;
+            const cantidad = parseFloat(producto.cantidad) || 0;
+            const descuento = parseFloat(producto.descuento) || 0;
+            return total + (precio * (1 - descuento / 100)) * cantidad;
+        }, 0);
 
         // 1. Generar ticket
         generarTicket(productos, totalFactura);
@@ -291,126 +320,165 @@ function editarProducto(index, campo, valor) {
         // 2. Sumar al total de la caja
         sumarDineroCajaActiva(totalFactura);
 
-        // 3. Limpiar productos y actualizar vista
+        // 3. Guardar la factura en la base de datos
+        enviarFacturaAlBackend(productos, totalFactura);
+
+        // 4. Limpiar productos y actualizar vista
         productos = [];
         actualizarFactura();
+
+        numeroFactura++;  // Incrementar el número de factura
+        document.getElementById('numeroFactura').value = numeroFactura;
+    }
+
+    function enviarFacturaAlBackend(productos, totalFactura) {
+        const data = {
+            productos: productos.map(producto => ({
+                nombre: producto.nombre,
+                precio: producto.precio,
+                cantidad: producto.cantidad,
+                descuento: producto.descuento
+            })),
+            total: totalFactura
+        };
+
+        fetch('/api/factura/guardar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al guardar la factura');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Factura guardada con éxito:', data);
+            })
+            .catch(error => {
+                console.error('Hubo un error:', error);
+            });
     }
 
 
     async function generarTicket(productos, totalFactura) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    const personalizacion = await fetch('/ticket-personalizado')
-        .then(response => response.json())
-        .catch(error => {
-            console.error('Error al cargar la personalización:', error);
-            return {};
-        });
+        const personalizacion = await fetch('/ticket-personalizado')
+            .then(response => response.json())
+            .catch(error => {
+                console.error('Error al cargar la personalización:', error);
+                return {};
+            });
 
-    const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
+        const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
 
-    const fuente = fontType || "Helvetica";
-    const tamanoFuente = fontSize || 12;
-    const anchoPagina = doc.internal.pageSize.getWidth();
-    let y = 10;
+        const fuente = fontType || "Helvetica";
+        const tamanoFuente = fontSize || 12;
+        const anchoPagina = doc.internal.pageSize.getWidth();
+        let y = 10;
 
-    doc.setFont(fuente, "normal");
-    doc.setFontSize(tamanoFuente);
+        doc.setFont(fuente, "normal");
+        doc.setFontSize(tamanoFuente);
 
-    // Logo
-    if (logoUrl) {
-        try {
-            const logoImg = await loadImage(logoUrl);
-            const logoAncho = 60;
-            const logoAlto = 60;
-            doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
-            y += logoAlto + 10;
-        } catch (error) {
-            console.error('Error al cargar el logo:', error);
+        // Logo
+        if (logoUrl) {
+            try {
+                const logoImg = await loadImage(logoUrl);
+                const logoAncho = 60;
+                const logoAlto = 60;
+                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
+                y += logoAlto + 10;
+            } catch (error) {
+                console.error('Error al cargar el logo:', error);
+            }
         }
-    }
 
-    // Texto personalizado
-    if (customText) {
-        const lineas = splitTextToLines(doc, customText, 180);
-        lineas.forEach(linea => {
-            doc.setFont(undefined, "italic");
-            doc.text(linea, anchoPagina / 2, y, { align: "center" });
-            y += 6;
-        });
-        y += 8;
-    }
+        // Texto personalizado
+        if (customText) {
+            const lineas = splitTextToLines(doc, customText, 180);
+            lineas.forEach(linea => {
+                doc.setFont(undefined, "italic");
+                doc.text(linea, anchoPagina / 2, y, { align: "center" });
+                y += 6;
+            });
+            y += 8;
+        }
 
-    // Título
-    doc.setFontSize(tamanoFuente + 2);
-    doc.setFont(undefined, "bold");
-    doc.text("FACTURA SIMPLIFICADA", anchoPagina / 2, y, { align: "center" });
-    y += 12;
+        // Título
+        doc.setFontSize(tamanoFuente + 2);
+        doc.setFont(undefined, "bold");
+        doc.text("FACTURA SIMPLIFICADA", anchoPagina / 2, y, { align: "center" });
+        y += 12;
 
-    // Fecha
-    if (showDate) {
-        const fecha = new Date().toLocaleString();
-        doc.setFontSize(tamanoFuente - 1);
+        // Número de factura
+        doc.setFontSize(tamanoFuente);
         doc.setFont(undefined, "normal");
-        doc.text(`Fecha: ${fecha}`, 10, y);
+        doc.text(`Factura #${numeroFactura - 1}`, 10, y);
         y += 8;
+
+        // Fecha
+        if (showDate) {
+            const fecha = new Date().toLocaleString();
+            doc.setFontSize(tamanoFuente - 1);
+            doc.setFont(undefined, "normal");
+            doc.text(`Fecha: ${fecha}`, 10, y);
+            y += 8;
+        }
+
+        // Encabezados
+        doc.setFontSize(tamanoFuente + 1);
+        doc.setFont(undefined, "bold");
+        doc.text("Producto", 10, y);
+        doc.text("Cant.", 90, y);
+        doc.text("Desc.", 120, y);
+        doc.text("Total", 170, y);
+        doc.setFont(undefined, "normal");
+        y += 10;
+
+        // Detalle productos
+        productos.forEach(prod => {
+            const descuento = prod.descuento || 0;
+            const precioConDescuento = prod.precio * (1 - descuento / 100);
+            const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
+
+            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
+            const cantidad = prod.cantidad.toString();
+
+            doc.setLineWidth(0.5);
+            doc.line(10, y - 2, anchoPagina - 10, y - 2);
+            y += 4;
+
+            doc.text(nombre, 10, y);
+            doc.text(cantidad, 100, y, { align: "right" });
+            doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
+            doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
+            y += 4;
+
+            doc.line(10, y, anchoPagina - 10, y);
+            y += 3;
+        });
+
+        // Total final usando el que ya viene calculado
+        y += 10;
+        doc.setFont(undefined, "bold");
+        doc.setFontSize(tamanoFuente + 2);
+        doc.text("TOTAL", 10, y);
+        doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
+        y += 80;
+
+        // Agradecimiento
+        doc.setFontSize(tamanoFuente - 1);
+        doc.setFont(undefined, "italic");
+        doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
+
+        doc.autoPrint();
+        window.open(doc.output('bloburl'), '_blank');
     }
-
-    // Encabezados con "Descuento"
-    doc.setFontSize(tamanoFuente + 1);
-    doc.setFont(undefined, "bold");
-    doc.text("Producto", 10, y);
-    doc.text("Cant.", 90, y);
-    doc.text("Desc.", 120, y);
-    doc.text("Total", 170, y);
-    doc.setFont(undefined, "normal");
-    y += 10;
-
-    // Detalle productos
-    let totalConDescuento = 0; // Variable para acumular el total con descuento
-    productos.forEach(prod => {
-        const descuento = prod.descuento || 0;
-        const precioConDescuento = prod.precio * (1 - descuento / 100);
-        const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
-        totalConDescuento += parseFloat(totalProductoConDescuento); // Sumamos el total con descuento
-
-        const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
-        const cantidad = prod.cantidad.toString();
-
-        // Líneas arriba y abajo
-        doc.setLineWidth(0.5);
-        doc.line(10, y - 2, anchoPagina - 10, y - 2); // Línea arriba
-        y += 4;
-
-        doc.text(nombre, 10, y);
-        doc.text(cantidad, 100, y, { align: "right" });
-        doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
-        doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
-        y += 4;
-
-        // Línea debajo del producto
-        doc.line(10, y , anchoPagina - 10, y); // Línea abajo
-        y += 3; // Espaciado después de la línea
-    });
-
-    // Total con descuentos aplicados
-    y += 10;
-    doc.setFont(undefined, "bold");
-    doc.setFontSize(tamanoFuente + 2);
-    doc.text("TOTAL", 10, y);
-    doc.text(`${totalConDescuento.toFixed(2)}€`, 190, y, { align: "right" });
-    y += 12;
-
-    // Agradecimiento
-    doc.setFontSize(tamanoFuente - 1);
-    doc.setFont(undefined, "italic");
-    doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
-
-    doc.autoPrint();
-    window.open(doc.output('bloburl'), '_blank');
-    }
-
 
 
     function loadImage(url) {
@@ -426,8 +494,6 @@ function editarProducto(index, campo, valor) {
     function splitTextToLines(doc, text, maxWidth) {
         return doc.splitTextToSize(text, maxWidth);
     }
-
-
 
 
     function cerrarCaja() {
