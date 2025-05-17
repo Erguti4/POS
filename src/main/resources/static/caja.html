@@ -77,6 +77,11 @@
     <div class="text-center mb-4 animate__animated animate__fadeInDown">
         <h1 class="display-4">Caja Abierta</h1>
         <p class="lead">Escanea productos o ingrésalos manualmente.</p>
+
+        <!-- Botón para ver todas las facturas -->
+            <a href="ver-facturas.html" class="btn btn-primary ms-3 my-2 my-lg-0">
+                <i class="bi bi-file-earmark-text me-2"></i> Ver Facturas
+            </a>
     </div>
 
     <!-- Número de Factura -->
@@ -405,27 +410,27 @@ function editarProducto(index, campo, valor) {
                 doc.text(linea, anchoPagina / 2, y, { align: "center" });
                 y += 6;
             });
-            y += 8;
+            y += 20;
         }
 
-        // Título
-        doc.setFontSize(tamanoFuente + 2);
-        doc.setFont(undefined, "bold");
-        doc.text("FACTURA SIMPLIFICADA", anchoPagina / 2, y, { align: "center" });
-        y += 12;
-
         // Número de factura
-        doc.setFontSize(tamanoFuente);
-        doc.setFont(undefined, "normal");
-        doc.text(`Factura #${numeroFactura - 1}`, 10, y);
+        doc.setFontSize(tamanoFuente + 15);
+        doc.setFont(undefined, "bold");
+        doc.text(`Factura Nº${numeroFactura - 1}`, 10, y);
         y += 8;
+
+        // Título
+        doc.setFontSize(tamanoFuente - 5);
+        doc.setFont(undefined, "normal");
+        doc.text("FACTURA SIMPLIFICADA", 10, y);
+        
 
         // Fecha
         if (showDate) {
             const fecha = new Date().toLocaleString();
             doc.setFontSize(tamanoFuente - 1);
             doc.setFont(undefined, "normal");
-            doc.text(`Fecha: ${fecha}`, 10, y);
+            doc.text(`${fecha}`, 130, y);
             y += 20;
         }
 
@@ -437,7 +442,10 @@ function editarProducto(index, campo, valor) {
         doc.text("Desc.", 120, y);
         doc.text("Importe", 160, y);
         doc.setFont(undefined, "normal");
+        doc.setLineWidth(0.1); // más fina que el valor por defecto
+        doc.line(10, y + 2, anchoPagina - 10, y + 2);
         y += 10;
+        
 
         // Detalle productos
         productos.forEach(prod => {
@@ -447,30 +455,28 @@ function editarProducto(index, campo, valor) {
 
             const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
             const cantidad = prod.cantidad.toString();
-
-            doc.setLineWidth(0.5);
-            doc.line(10, y - 2, anchoPagina - 10, y - 2);
             y += 4;
 
             doc.text(nombre, 10, y);
             doc.text(cantidad, 100, y, { align: "right" });
             doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
             doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
-            y += 4;
+            y += 7;
 
-            doc.setLineWidth(0.1); // más fina que el valor por defecto
-            doc.line(10, y, anchoPagina - 10, y);
-
-            y += 3;
         });
 
+        doc.setLineWidth(0.1); // más fina que el valor por defecto
+        doc.line(10, y, anchoPagina - 10, y);
+
         // Total final usando el que ya viene calculado
-        y += 20;
+        y += 30;
         doc.setFont(undefined, "bold");
         doc.setFontSize(tamanoFuente + 15 );
-        doc.text("TOTAL", 10, y);
+        doc.text("TOTAL", 80, y);
         doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
-        y += 5;
+        y += 10;
+        doc.setLineWidth(0.1); // más fina que el valor por defecto
+        doc.line(10, y, anchoPagina - 10, y);
 
         // Calcular base imponible e IVA (suponiendo IVA 21%)
         const porcentajeIVA = 21;
@@ -480,20 +486,27 @@ function editarProducto(index, campo, valor) {
         y += 10;
         doc.setFontSize(tamanoFuente);
         doc.setFont(undefined, "normal");
-        doc.text("Base imponible:", 10, y);
-        doc.text(`${totalSinIVA.toFixed(2)}€`, 190, y, { align: "right" });
+        doc.text("Base imponible.", 60, y);
+        doc.text(`% IVA (${porcentajeIVA}%)`, 130, y);
 
         y += 10;
-        doc.text(`% IVA (${porcentajeIVA}%)`, 10, y);
-        doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
+        doc.text(`${totalSinIVA.toFixed(2)}€`, 115, y, { align: "right" });
+        doc.text(`${totalIVA.toFixed(2)}€`, 170, y, { align: "right" });
         y += 40;
 
         // Agradecimiento
         doc.setFontSize(tamanoFuente - 1);
-        doc.setFont(undefined, "italic");
-        doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
-        y += 6;
-        doc.text("Garantia 2 Años", anchoPagina / 2, y, { align: "center" });
+        doc.setFont(undefined, "normal");
+        doc.text("GRACIAS POR SU COMPRA", anchoPagina / 2, y, { align: "center" });
+        y += 8;
+
+        // Condiciones
+        doc.setFontSize(tamanoFuente - 3);
+        doc.text("Ticket obligatorio para cambios de 7 días después de la compra", 10, y);
+        y += 8;
+        doc.text("No se devuelve  el   dinero, se   canjea   por   un   vale  de   caja", 10, y);
+        y += 8;
+        doc.text("Garantía del producto  según   normativa   vigente   24  MESES", 10, y);
 
         doc.autoPrint();
         window.open(doc.output('bloburl'), '_blank');
