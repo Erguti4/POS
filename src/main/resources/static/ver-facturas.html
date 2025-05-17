@@ -92,6 +92,13 @@
         <p class="lead fs-4">Visualiza las facturas generadas y sus productos asociados.</p>
     </div>
 
+    <!-- Filtro por fecha -->
+    <div class="mb-4 d-flex justify-content-end">
+        <label for="filtroFecha" class="me-2 fw-bold align-self-center">Filtrar por fecha:</label>
+        <input type="date" id="filtroFecha" class="form-control w-auto" />
+    </div>
+
+
     <!-- Facturas -->
     <div class="mt-5 animate__animated animate__fadeInUp">
         <h3 class="mb-3">Lista de Facturas</h3>
@@ -126,6 +133,7 @@
     let facturas = [];
     let paginaActual = 0;
     const facturasPorPagina = 6;
+    let filtroFecha = null; // Nueva variable para el filtro
 
     document.addEventListener("DOMContentLoaded", () => {
         fetch('/api/factura')  // Asegúrate de que este endpoint retorne las facturas con los productos asociados
@@ -152,6 +160,14 @@
                 mostrarPagina(paginaActual);
             }
         });
+
+        document.getElementById("filtroFecha").addEventListener("change", (event) => {
+            const valor = event.target.value;
+            filtroFecha = valor ? new Date(valor) : null;
+            paginaActual = 0;
+            mostrarPagina(paginaActual);
+        });
+
     });
 
     function mostrarPagina(pagina) {
@@ -160,7 +176,17 @@
 
         const inicio = pagina * facturasPorPagina;
         const fin = inicio + facturasPorPagina;
-        const facturasPagina = facturas.slice(inicio, fin);
+        
+        const facturasFiltradas = filtroFecha
+            ? facturas.filter(f => {
+                const fechaFactura = new Date(f.fecha);
+                return fechaFactura.toDateString() === filtroFecha.toDateString();
+            })
+            : facturas;
+
+        const totalPaginas = Math.ceil(facturasFiltradas.length / facturasPorPagina);
+        const facturasPagina = facturasFiltradas.slice(inicio, inicio + facturasPorPagina);
+
 
         facturasPagina.forEach((factura, index) => {
             const row = document.createElement("tr");
