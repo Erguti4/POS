@@ -17,6 +17,10 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/css/styles.css" />
 
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
     <style>
         body {
             background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
@@ -182,6 +186,9 @@
                 <td>${factura.total.toFixed(2)}€</td>
                 <td>
                     <button class="btn btn-info" onclick="verProductos(${factura.id})">Ver Productos</button>
+                    <button class="btn btn-success" onclick="imprimirFactura(${factura.id})">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
                     <div id="productosFactura${factura.id}" class="productos-factura" style="display: none;">
                         <table class="table mt-3">
                             <thead>
@@ -206,6 +213,178 @@
         const productosFactura = document.getElementById(`productosFactura${facturaId}`);
         productosFactura.style.display = productosFactura.style.display === 'none' ? 'block' : 'none';
     }
+
+
+    async function imprimirFactura(facturaId) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const anchoPagina = doc.internal.pageSize.getWidth();
+        let y = 10;
+
+        // Obtener la factura correspondiente
+        const factura = facturas.find(f => f.id === facturaId);
+        if (!factura) return;
+
+        const totalFactura = factura.total;
+        const productos = factura.productos;
+
+        // Obtener personalización
+        const personalizacion = await fetch('/ticket-personalizado')
+            .then(response => response.json())
+            .catch(error => {
+                console.error('Error al cargar la personalización:', error);
+                return {};
+            });
+
+        const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
+
+        const fuente = fontType || "Helvetica";
+        const tamanoFuente = fontSize || 12;
+
+        doc.setFont(fuente, "normal");
+        doc.setFontSize(tamanoFuente);
+
+        // Logo
+        if (logoUrl) {
+            try {
+                const logoImg = await loadImage(logoUrl);
+                const logoAncho = 90;
+                const logoAlto = 60;
+                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
+                y += logoAlto + 10;
+            } catch (error) {
+                console.error('Error al cargar el logo:', error);
+            }
+        }
+
+        // Texto personalizado
+        if (customText) {
+            const lineas = splitTextToLines(doc, customText, 180);
+            lineas.forEach(linea => {
+                doc.setFont(undefined, "italic");
+                doc.text(linea, anchoPagina / 2, y, { align: "center" });
+                y += 6;
+            });
+            y += 8;
+        }
+
+        // Teléfono y NIF
+        doc.setFontSize(tamanoFuente + 2);
+        doc.setFont(undefined, "bold");
+        doc.text(`Telf.954 17 17 16`, 10, y);
+        doc.text(`NIF: 28742186-Y`, 130, y);
+        y += 20;
+
+        // Número de factura
+        doc.setFontSize(tamanoFuente + 15);
+        doc.setFont(undefined, "bold");
+        doc.text(`Factura Nº ${factura.id}`, 10, y);
+        y += 8;
+
+        // Título
+        doc.setFontSize(tamanoFuente - 5);
+        doc.setFont(undefined, "normal");
+        doc.text("FACTURA SIMPLIFICADA", 10, y);
+
+        // Fecha
+        if (showDate) {
+            const fecha = new Date(factura.fecha).toLocaleString();
+            doc.setFontSize(tamanoFuente - 1);
+            doc.setFont(undefined, "normal");
+            doc.text(`${fecha}`, 130, y);
+            y += 20;
+        }
+
+        // Encabezados de tabla
+        doc.setFontSize(tamanoFuente + 1);
+        doc.setFont(undefined, "bold");
+        doc.text("Producto", 10, y);
+        doc.text("Cant.", 90, y);
+        doc.text("Desc.", 120, y);
+        doc.text("Importe", 160, y);
+        doc.line(10, y + 2, anchoPagina - 10, y + 2);
+        y += 10;
+
+        // Detalle de productos
+        doc.setFont(undefined, "normal");
+        productos.forEach(prod => {
+            const descuento = prod.descuento || 0;
+            const precioConDescuento = prod.precio * (1 - descuento / 100);
+            const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
+
+            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
+            y += 4;
+            doc.text(nombre, 10, y);
+            doc.text(prod.cantidad.toString(), 100, y, { align: "right" });
+            doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
+            doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
+            y += 7;
+        });
+
+        doc.line(10, y, anchoPagina - 10, y);
+        y += 30;
+
+        // Total final
+        doc.setFont(undefined, "bold");
+        doc.setFontSize(tamanoFuente + 15);
+        doc.text("TOTAL", 80, y);
+        doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
+        y += 10;
+        doc.line(10, y, anchoPagina - 10, y);
+
+        // Base imponible e IVA
+        const porcentajeIVA = 21;
+        const totalSinIVA = totalFactura / (1 + porcentajeIVA / 100);
+        const totalIVA = totalFactura - totalSinIVA;
+        y += 10;
+
+        doc.setFontSize(tamanoFuente);
+        doc.setFont(undefined, "normal");
+        doc.text("Base imponible.", 80, y);
+        doc.text(`% IVA (${porcentajeIVA}%)`, 145, y);
+        y += 10;
+
+        doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
+        doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
+        y += 20;
+        doc.line(10, y, anchoPagina - 10, y);
+        y += 10;
+
+        // Agradecimiento
+        doc.setFontSize(tamanoFuente - 1);
+        doc.text("GRACIAS POR SU COMPRA", anchoPagina / 2, y, { align: "center" });
+        y += 8;
+
+        // Condiciones
+        doc.setFontSize(tamanoFuente - 3);
+        doc.text("Ticket obligatorio para cambios de 7 días después de la compra", 10, y);
+        y += 8;
+        doc.text("No se devuelve  el   dinero, se   canjea   por   un   vale  de   caja", 10, y);
+        y += 8;
+        doc.text("Garantía del producto  según   normativa   vigente   24  MESES", 10, y);
+
+        // Abrir o guardar
+        doc.autoPrint();
+        window.open(doc.output('bloburl'), '_blank');
+    }
+
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    function splitTextToLines(doc, text, maxWidth) {
+        return doc.splitTextToSize(text, maxWidth);
+    }
+
+
+
+
 </script>
 
 </body>
