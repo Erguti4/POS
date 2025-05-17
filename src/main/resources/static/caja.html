@@ -145,7 +145,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <!-- Bootstrap JS -->
@@ -389,7 +388,7 @@ function editarProducto(index, campo, valor) {
         if (logoUrl) {
             try {
                 const logoImg = await loadImage(logoUrl);
-                const logoAncho = 60;
+                const logoAncho = 90;
                 const logoAlto = 60;
                 doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
                 y += logoAlto + 10;
@@ -427,7 +426,7 @@ function editarProducto(index, campo, valor) {
             doc.setFontSize(tamanoFuente - 1);
             doc.setFont(undefined, "normal");
             doc.text(`Fecha: ${fecha}`, 10, y);
-            y += 8;
+            y += 20;
         }
 
         // Encabezados
@@ -436,7 +435,7 @@ function editarProducto(index, campo, valor) {
         doc.text("Producto", 10, y);
         doc.text("Cant.", 90, y);
         doc.text("Desc.", 120, y);
-        doc.text("Total", 170, y);
+        doc.text("Importe", 160, y);
         doc.setFont(undefined, "normal");
         y += 10;
 
@@ -459,22 +458,42 @@ function editarProducto(index, campo, valor) {
             doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
             y += 4;
 
+            doc.setLineWidth(0.1); // más fina que el valor por defecto
             doc.line(10, y, anchoPagina - 10, y);
+
             y += 3;
         });
 
         // Total final usando el que ya viene calculado
-        y += 10;
+        y += 20;
         doc.setFont(undefined, "bold");
-        doc.setFontSize(tamanoFuente + 2);
+        doc.setFontSize(tamanoFuente + 15 );
         doc.text("TOTAL", 10, y);
         doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
-        y += 80;
+        y += 5;
+
+        // Calcular base imponible e IVA (suponiendo IVA 21%)
+        const porcentajeIVA = 21;
+        const totalSinIVA = totalFactura / (1 + porcentajeIVA / 100);
+        const totalIVA = totalFactura - totalSinIVA;
+
+        y += 10;
+        doc.setFontSize(tamanoFuente);
+        doc.setFont(undefined, "normal");
+        doc.text("Base imponible:", 10, y);
+        doc.text(`${totalSinIVA.toFixed(2)}€`, 190, y, { align: "right" });
+
+        y += 10;
+        doc.text(`% IVA (${porcentajeIVA}%)`, 10, y);
+        doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
+        y += 40;
 
         // Agradecimiento
         doc.setFontSize(tamanoFuente - 1);
         doc.setFont(undefined, "italic");
         doc.text("Gracias por su compra", anchoPagina / 2, y, { align: "center" });
+        y += 6;
+        doc.text("Garantia 2 Años", anchoPagina / 2, y, { align: "center" });
 
         doc.autoPrint();
         window.open(doc.output('bloburl'), '_blank');

@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,7 +58,7 @@ public class FacturaService {
 
 
     public List<Factura> obtenerFacturas() {
-        return facturaRepository.findAll();
+        return facturaRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public Long obtenerUltimaFacturaId() {
