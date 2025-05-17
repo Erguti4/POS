@@ -101,7 +101,9 @@
         <div class="input-group mb-4">
             <label for="codigoBarraInput"></label>
             <input type="text" id="codigoBarraInput" class="form-control form-control-lg" placeholder="Escanea o escribe el código de barras" autofocus>
-            <button class="btn btn-primary btn-lg" onclick="buscarProducto()">Agregar</button>
+            <button class="btn btn-primary btn-lg" onclick="buscarProducto()">
+                <i class="bi bi-plus-circle"></i> Agregar
+            </button>
         </div>
 
         <div class="row fw-bold border-bottom pb-2">
@@ -119,8 +121,12 @@
 
         <!-- Acciones -->
         <div class="d-flex justify-content-between mt-5">
-            <button class="btn btn-secondary btn-lg" onclick="cerrarCaja()">Cerrar Caja</button>
-            <button class="btn btn-success btn-lg" onclick="finalizarFactura()">Imprimir</button>
+            <button class="btn btn-outline-secondary btn-lg" onclick="cerrarCaja()">
+                <i class="bi bi-x-circle"></i> Cerrar Caja
+            </button>
+            <button class="btn btn-success btn-lg" onclick="finalizarFactura()">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
         </div>
     </div>
 
