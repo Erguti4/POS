@@ -410,13 +410,24 @@ function editarProducto(index, campo, valor) {
                 doc.text(linea, anchoPagina / 2, y, { align: "center" });
                 y += 6;
             });
-            y += 20;
+            y += 8;
         }
+
+        //Telefono y NIF
+        doc.setFontSize(tamanoFuente + 2);
+        doc.setFont(undefined, "bold");
+        doc.text(`Telf.954 17 17 16`, 10, y);
+
+        doc.setFontSize(tamanoFuente + 2);
+        doc.setFont(undefined, "bold");
+        doc.text(`NIF: 28742186-Y`, 130, y);
+
+        y+= 20;
 
         // Número de factura
         doc.setFontSize(tamanoFuente + 15);
         doc.setFont(undefined, "bold");
-        doc.text(`Factura Nº${numeroFactura - 1}`, 10, y);
+        doc.text(`Factura Nº ${numeroFactura - 1}`, 10, y);
         y += 8;
 
         // Título
@@ -482,17 +493,22 @@ function editarProducto(index, campo, valor) {
         const porcentajeIVA = 21;
         const totalSinIVA = totalFactura / (1 + porcentajeIVA / 100);
         const totalIVA = totalFactura - totalSinIVA;
-
         y += 10;
+
+        // Encabezado IVA
         doc.setFontSize(tamanoFuente);
         doc.setFont(undefined, "normal");
-        doc.text("Base imponible.", 60, y);
-        doc.text(`% IVA (${porcentajeIVA}%)`, 130, y);
-
+        doc.text("Base imponible.", 80, y);
+        doc.text(`% IVA (${porcentajeIVA}%)`, 145, y);
         y += 10;
-        doc.text(`${totalSinIVA.toFixed(2)}€`, 115, y, { align: "right" });
-        doc.text(`${totalIVA.toFixed(2)}€`, 170, y, { align: "right" });
-        y += 40;
+
+        // Textos iva
+        doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
+        doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
+        y += 20;
+        doc.setLineWidth(0.1); // más fina que el valor por defecto
+        doc.line(10, y, anchoPagina - 10, y);
+        y += 10;
 
         // Agradecimiento
         doc.setFontSize(tamanoFuente - 1);
