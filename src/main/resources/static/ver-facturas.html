@@ -291,7 +291,7 @@
                 doc.text(linea, anchoPagina / 2, y, { align: "center" });
                 y += 6;
             });
-            y += 8;
+            y += 2;
         }
 
         // Teléfono y NIF
@@ -318,7 +318,7 @@
             doc.setFontSize(tamanoFuente - 1);
             doc.setFont(undefined, "normal");
             doc.text(`${fecha}`, 130, y);
-            y += 20;
+            y += 10;
         }
 
         // Encabezados de tabla
@@ -348,7 +348,7 @@
         });
 
         doc.line(10, y, anchoPagina - 10, y);
-        y += 30;
+        y += 20;
 
         // Total final
         doc.setFont(undefined, "bold");
@@ -372,7 +372,7 @@
 
         doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
         doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
-        y += 20;
+        y += 10;
         doc.line(10, y, anchoPagina - 10, y);
         y += 10;
 

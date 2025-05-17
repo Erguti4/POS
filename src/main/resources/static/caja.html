@@ -178,7 +178,13 @@
     // Llamamos a la función para obtener el último ID al cargar la página
     window.onload = function() {
         obtenerUltimoNumeroFactura();
+
+        const guardado = localStorage.getItem('dineroCajaActiva');
+        if (guardado !== null) {
+            dineroCajaActiva = parseFloat(guardado);
+        }
     }
+
     let productos = [];
 
     function buscarProducto() {
@@ -247,52 +253,52 @@
     }
 
     function actualizarFactura() {
-    const contenedor = document.getElementById('facturaItems');
-    const totalElem = document.getElementById('totalFactura');
-    contenedor.innerHTML = ''; // Limpiar la lista de productos
+        const contenedor = document.getElementById('facturaItems');
+        const totalElem = document.getElementById('totalFactura');
+        contenedor.innerHTML = ''; // Limpiar la lista de productos
 
-    let total = 0;
+        let total = 0;
 
-    productos.forEach((producto, index) => {
-        const descuento = producto.descuento || 0;
-        const precioConDescuento = producto.precio * (1 - descuento / 100);
-        const importe = precioConDescuento * producto.cantidad;
+        productos.forEach((producto, index) => {
+            const descuento = producto.descuento || 0;
+            const precioConDescuento = producto.precio * (1 - descuento / 100);
+            const importe = precioConDescuento * producto.cantidad;
 
-        const item = document.createElement('div');
-        item.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'border-bottom', 'py-2', 'gap-2');
-        item.innerHTML = `
-            <input type="text" value="${producto.nombre}" class="form-control" onblur="editarProducto(${index}, 'nombre', this.value)">
-            <input type="number" value="${producto.cantidad}" class="form-control w-15" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
-            <input type="number" value="${producto.descuento || ''}" placeholder="%" class="form-control w-15" min="0" max="100" onblur="editarProducto(${index}, 'descuento', this.value)">
-            <input type="number" value="${producto.precio}" class="form-control w-15" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
-            <span class="text-end">${importe.toFixed(2)}€</span>
-            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
-        `;
-        contenedor.appendChild(item);
-        total += importe;
-    });
+            const item = document.createElement('div');
+            item.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'border-bottom', 'py-2', 'gap-2');
+            item.innerHTML = `
+                <input type="text" value="${producto.nombre}" class="form-control" onblur="editarProducto(${index}, 'nombre', this.value)">
+                <input type="number" value="${producto.cantidad}" class="form-control w-15" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
+                <input type="number" value="${producto.descuento || ''}" placeholder="%" class="form-control w-15" min="0" max="100" onblur="editarProducto(${index}, 'descuento', this.value)">
+                <input type="number" value="${producto.precio}" class="form-control w-15" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
+                <span class="text-end">${importe.toFixed(2)}€</span>
+                <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
+            `;
+            contenedor.appendChild(item);
+            total += importe;
+        });
 
-    totalElem.textContent = total.toFixed(2); // Actualizar el total
+        totalElem.textContent = total.toFixed(2); // Actualizar el total
     }
 
 
-function editarProducto(index, campo, valor) {
-    if (campo === 'cantidad') {
-        valor = parseInt(valor);
-        if (isNaN(valor) || valor <= 0) return;
-        productos[index].cantidad = valor;
-    } else if (campo === 'precio') {
-        valor = parseFloat(valor);
-        if (isNaN(valor) || valor < 0) return;
-        productos[index].precio = valor;
-    } else if (campo === 'descuento') {
-        valor = parseFloat(valor);
-        if (isNaN(valor) || valor < 0 || valor > 100) return;
-        productos[index].descuento = valor;
-    } else if (campo === 'nombre') {
-        productos[index].nombre = valor;
-    }
-    actualizarFactura();
+    function editarProducto(index, campo, valor) {
+        if (campo === 'cantidad') {
+            valor = parseInt(valor);
+            if (isNaN(valor) || valor <= 0) return;
+            productos[index].cantidad = valor;
+        } else if (campo === 'precio') {
+            valor = parseFloat(valor);
+            if (isNaN(valor) || valor < 0) return;
+            productos[index].precio = valor;
+        } else if (campo === 'descuento') {
+            valor = parseFloat(valor);
+            if (isNaN(valor) || valor < 0 || valor > 100) return;
+            productos[index].descuento = valor;
+        } else if (campo === 'nombre') {
+            productos[index].nombre = valor;
+        }
+        actualizarFactura();
     }
 
     function eliminarProducto(index) {
@@ -304,40 +310,10 @@ function editarProducto(index, campo, valor) {
 
     function sumarDineroCajaActiva(monto) {
         dineroCajaActiva += monto;
+        localStorage.setItem('dineroCajaActiva', dineroCajaActiva.toFixed(2));
     }
 
-
-    function finalizarFactura() {
-        if (productos.length === 0) {
-            alert("No hay productos en la factura.");
-            return;
-        }
-
-        // Calcular total
-        const totalFactura = productos.reduce((total, producto) => {
-            const precio = parseFloat(producto.precio) || 0;
-            const cantidad = parseFloat(producto.cantidad) || 0;
-            const descuento = parseFloat(producto.descuento) || 0;
-            return total + (precio * (1 - descuento / 100)) * cantidad;
-        }, 0);
-
-        // 1. Generar ticket
-        generarTicket(productos, totalFactura);
-
-        // 2. Sumar al total de la caja
-        sumarDineroCajaActiva(totalFactura);
-
-        // 3. Guardar la factura en la base de datos
-        enviarFacturaAlBackend(productos, totalFactura);
-
-        // 4. Limpiar productos y actualizar vista
-        productos = [];
-        actualizarFactura();
-
-        numeroFactura++;  // Incrementar el número de factura
-        document.getElementById('numeroFactura').value = numeroFactura;
-    }
-
+    
     function enviarFacturaAlBackend(productos, totalFactura) {
         const data = {
             productos: productos.map(producto => ({
@@ -369,6 +345,30 @@ function editarProducto(index, campo, valor) {
                 console.error('Hubo un error:', error);
             });
     }
+
+
+    function cerrarCaja() {
+        const totalCaja = dineroCajaActiva.toFixed(2);
+
+        fetch(`/api/caja/cerrar?totalVentas=${totalCaja}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Caja cerrada correctamente.");
+                    dineroCajaActiva = 0;
+                    localStorage.removeItem('dineroCajaActiva'); // <== LIMPIAR
+                    window.location.href = "/"; 
+                } else {
+                    alert("Error al cerrar la caja.");
+                }
+            })
+            .catch(err => {
+                console.error("Error al cerrar la caja:", err);
+                alert("Error de red al cerrar la caja.");
+            });
+    }
+
 
 
     async function generarTicket(productos, totalFactura) {
@@ -413,7 +413,7 @@ function editarProducto(index, campo, valor) {
                 doc.text(linea, anchoPagina / 2, y, { align: "center" });
                 y += 6;
             });
-            y += 8;
+            y += 2;
         }
 
         //Telefono y NIF
@@ -445,7 +445,7 @@ function editarProducto(index, campo, valor) {
             doc.setFontSize(tamanoFuente - 1);
             doc.setFont(undefined, "normal");
             doc.text(`${fecha}`, 130, y);
-            y += 20;
+            y += 10;
         }
 
         // Encabezados
@@ -483,7 +483,7 @@ function editarProducto(index, campo, valor) {
         doc.line(10, y, anchoPagina - 10, y);
 
         // Total final usando el que ya viene calculado
-        y += 30;
+        y += 20;
         doc.setFont(undefined, "bold");
         doc.setFontSize(tamanoFuente + 15 );
         doc.text("TOTAL", 80, y);
@@ -508,7 +508,7 @@ function editarProducto(index, campo, valor) {
         // Textos iva
         doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
         doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
-        y += 20;
+        y += 10;
         doc.setLineWidth(0.1); // más fina que el valor por defecto
         doc.line(10, y, anchoPagina - 10, y);
         y += 10;
@@ -547,25 +547,37 @@ function editarProducto(index, campo, valor) {
     }
 
 
-    function cerrarCaja() {
-        const totalCaja = dineroCajaActiva.toFixed(2);
+    
 
-        fetch(`/api/caja/cerrar?totalVentas=${totalCaja}`, {
-            method: 'POST'
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert("Caja cerrada correctamente.");
-                    dineroCajaActiva = 0; // Reinicia el acumulado tras cerrar
-                    window.location.href = "/"; // Redirigir a la página inicial
-                } else {
-                    alert("Error al cerrar la caja.");
-                }
-            })
-            .catch(err => {
-                console.error("Error al cerrar la caja:", err);
-                alert("Error de red al cerrar la caja.");
-            });
+    function finalizarFactura() {
+        if (productos.length === 0) {
+            alert("No hay productos en la factura.");
+            return;
+        }
+
+        // Calcular total
+        const totalFactura = productos.reduce((total, producto) => {
+            const precio = parseFloat(producto.precio) || 0;
+            const cantidad = parseFloat(producto.cantidad) || 0;
+            const descuento = parseFloat(producto.descuento) || 0;
+            return total + (precio * (1 - descuento / 100)) * cantidad;
+        }, 0);
+
+        // 1. Generar ticket
+        generarTicket(productos, totalFactura);
+
+        // 2. Sumar al total de la caja
+        sumarDineroCajaActiva(totalFactura);
+
+        // 3. Guardar la factura en la base de datos
+        enviarFacturaAlBackend(productos, totalFactura);
+
+        // 4. Limpiar productos y actualizar vista
+        productos = [];
+        actualizarFactura();
+
+        numeroFactura++;  // Incrementar el número de factura
+        document.getElementById('numeroFactura').value = numeroFactura;
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
