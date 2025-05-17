@@ -168,11 +168,13 @@
         </div>
     </div>
 
-    <!-- Botones Abrir y Cerrar Caja -->
+    <!-- Botones Abrir, Cerrar y Volver a Caja -->
     <div class="cerrar-caja-container">
         <button id="abrirCaja" class="panel-boton animate__animated">Abrir Caja</button>
         <button id="cerrarCaja" class="panel-boton animate__animated">Cerrar Caja</button>
+        <button id="volverCaja" class="panel-boton animate__animated btn-warning" style="display: none;">Volver a la Caja</button>
     </div>
+
 </div>
 
 <!-- Bootstrap JS -->
@@ -228,6 +230,11 @@
                     alert("Error al abrir la caja.");
                 });
         });
+
+        document.getElementById("volverCaja").addEventListener("click", () => {
+            window.location.href = "/caja.html";
+        });
+
 
         document.getElementById("cerrarCaja").addEventListener("click", () => {
             let totalFactura = 0;
@@ -293,9 +300,11 @@
             tabla.appendChild(row);
 
             if (caja.estado === 'ABIERTA') {
-                cajaAbierta = true;
-                document.getElementById("cerrarCaja").style.display = 'inline-block';
-            }
+            cajaAbierta = true;
+            document.getElementById("cerrarCaja").style.display = 'inline-block';
+            document.getElementById("volverCaja").style.display = 'inline-block';
+        }
+
         });
     }
 </script>
