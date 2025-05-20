@@ -18,59 +18,162 @@
     <link rel="stylesheet" href="/css/styles.css"/>
 
     <style>
-        body {
-            background: linear-gradient(to bottom right, #fff3e0, #ffffff); /* fondo suave */
-            font-size: 1.3rem;
-        }
+    body {
+        background: linear-gradient(to bottom right, #f2f6fc, #ffffff);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 1.2rem;
+        color: #2c3e50;
+    }
 
-        .factura-panel {
-            background-color: #fff;
-            border-radius: 1.5rem;
-            padding: 2.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid #f0f0f0;
-        }
+    .factura-panel {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        padding: 2rem 2.5rem;
+        box-shadow: 0 8px 20px rgba(44, 62, 80, 0.15);
+        border: 1px solid #e3eaf3;
+        transition: all 0.3s ease;
+    }
+
+    .factura-panel:hover {
+        box-shadow: 0 10px 30px rgba(44, 62, 80, 0.25);
+    }
+
+    h1, h3 {
+        color: #2c3e50;
+    }
+
+    .btn-primary {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+
+    .btn-primary:hover {
+        background-color: #2471a3;
+        border-color: #2471a3;
+    }
+
+    .btn-success {
+        background-color: #27ae60;
+        border-color: #27ae60;
+    }
+
+    .btn-success:hover {
+        background-color: #229954;
+        border-color: #229954;
+    }
+
+    .btn-outline-secondary {
+        border-color: #95a5a6;
+        color: #2c3e50;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #bdc3c7;
+        color: #2c3e50;
+    }
+
+    .table thead th {
+        background-color: #3498db;
+        color: white;
+        font-size: 1.05rem;
+        text-align: center;
+        border-bottom: 2px solid #2980b9;
+    }
+
+    .table tbody tr:nth-child(odd) {
+        background-color: #f7f9fb;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #ecf0f1;
+    }
+
+    .table td {
+        text-align: center;
+        padding: 0.75rem;
+        font-size: 1.05rem;
+    }
+
+    .table tbody tr:hover {
+        background-color: #d6eaf8;
+        transition: background-color 0.3s ease;
+    }
+
+    .total {
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-top: 2rem;
+        text-align: right;
+        color: #c0392b;
+    }
+
+    /* Campo: Cantidad */
+    .input-cantidad {
+        max-width: 60px;         
+        font-size: 0.9rem;       
+        padding: 0.3rem 0.3rem;  
+        text-align: center;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+
+    /* Campo: Precio */
+    .input-precio {
+        max-width: 100px;         
+        font-size: 0.95rem;
+        padding: 0.3rem 0.5rem;
+        text-align: right;       
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+
+    /* Campo: Nombre */
+    .input-nombre {
+        max-width: 830px;
+        font-size: 1rem;      
+        padding: 0.3rem 0.5rem;
+        text-align: left;       
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+
+    /* Campo: Descuento */
+    .input-descuento {
+        max-width: 60px;
+        font-size: 0.85rem;      
+        padding: 0.3rem 0.5rem;
+        text-align: right;       
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
 
 
+    input[type="text"],
+    input[type="number"] {
+        transition: border-color 0.2s ease;
+    }
 
-        .table thead th {
-            background-color: #ffb74d;
-            color: #212529;
-            font-size: 1.1rem;
-            text-align: center;
-            border-bottom: 2px solid #e0e0e0;
-        }
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.15rem rgba(52, 152, 219, 0.25);
+        outline: none;
+    }
 
-        .table tbody tr:nth-child(odd) {
-            background-color: #fff3e0;
-        }
+    /* Botón rojo de eliminar */
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        font-weight: bold;
+    }
 
-        .table tbody tr:nth-child(even) {
-            background-color: #ffe0b2;
-        }
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
 
-        .table td {
-            text-align: center;
-            padding: 1rem;
-            font-size: 1.1rem;
-        }
+</style>
 
-        .table tbody tr:hover {
-            background-color: #ffd180;
-            transition: background-color 0.3s ease;
-        }
-
-        .total {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 2rem;
-            text-align: right;
-            color: #d84315;
-        }
-
-
-
-    </style>
 </head>
 <body>
 <div class="container py-5">
@@ -107,12 +210,13 @@
         </div>
 
         <div class="row fw-bold border-bottom pb-2">
-            <div class="col-3">Nombre</div>
-            <div class="col-3">Cantidad</div>
-            <div class="col-2 text-center">Descuento (%)</div>
-            <div class="col-2 text-end">Importe</div>
+            <div class="col-8">Nombre</div>
+            <div class="col-1 text-end">Unid</div>
+            <div class="col-1 text-end">Precio</div>
+            <div class="col-1 text-center">Des</div>
+            <div class="col-1 text-end">Importe</div>
         </div>
-        
+
         
         <div id="facturaItems" class="mt-3"></div>
 
@@ -192,6 +296,14 @@
     }
 
     let productos = [];
+    
+    document.getElementById('codigoBarraInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Evita comportamiento por defecto si es necesario
+            buscarProducto();
+        }
+    });
+
 
     function buscarProducto() {
         const codigo = document.getElementById('codigoBarraInput').value.trim();
@@ -273,13 +385,15 @@
             const item = document.createElement('div');
             item.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'border-bottom', 'py-2', 'gap-2');
             item.innerHTML = `
-                <input type="text" value="${producto.nombre}" class="form-control" onblur="editarProducto(${index}, 'nombre', this.value)">
-                <input type="number" value="${producto.cantidad}" class="form-control w-15" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
-                <input type="number" value="${producto.descuento || ''}" placeholder="%" class="form-control w-15" min="0" max="100" onblur="editarProducto(${index}, 'descuento', this.value)">
-                <input type="number" value="${producto.precio}" class="form-control w-15" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
-                <span class="text-end">${importe.toFixed(2)}€</span>
-                <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
-            `;
+            <input type="text" value="${producto.nombre}" class="form-control input-nombre" onblur="editarProducto(${index}, 'nombre', this.value)">
+            <input type="number" value="${producto.cantidad}" class="form-control input-cantidad" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
+            <input type="number" value="${producto.precio.toFixed(2)}" class="form-control input-precio" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
+            <input type="number" value="${(producto.descuento || 0)}" class="form-control input-descuento" min="0" max="100" step="0.01" onblur="editarProducto(${index}, 'descuento', this.value)">
+            <span class="text-end">${importe.toFixed(2)}€</span>    
+            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
+        `;
+
+
             contenedor.appendChild(item);
             total += importe;
         });
@@ -379,7 +493,16 @@
 
     async function generarTicket(productos, totalFactura) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const alturaBase = 180; // Altura mínima
+        const alturaPorProducto = 10; // Altura media por producto
+        const margenInferior = 80; // Para totales, IVA, condiciones...
+
+        const alturaCalculada = alturaBase + productos.length * alturaPorProducto + margenInferior;
+
+        const doc = new jsPDF({
+            unit: "mm",
+            format: [200, alturaCalculada], // Ticket: ancho fijo, altura variable
+        });
 
         const personalizacion = await fetch('/ticket-personalizado')
             .then(response => response.json())
@@ -394,6 +517,7 @@
         const tamanoFuente = fontSize || 12;
         const anchoPagina = doc.internal.pageSize.getWidth();
         let y = 10;
+        
 
         doc.setFont(fuente, "normal");
         doc.setFontSize(tamanoFuente);
@@ -402,7 +526,7 @@
         if (logoUrl) {
             try {
                 const logoImg = await loadImage(logoUrl);
-                const logoAncho = 90;
+                const logoAncho = 180;
                 const logoAlto = 60;
                 doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
                 y += logoAlto + 10;
@@ -429,7 +553,7 @@
 
         doc.setFontSize(tamanoFuente + 2);
         doc.setFont(undefined, "bold");
-        doc.text(`NIF: 28742186-Y`, 130, y);
+        doc.text(`NIF: 28742186-Y`, 123, y);
 
         y+= 20;
 
@@ -450,7 +574,7 @@
             const fecha = new Date().toLocaleString();
             doc.setFontSize(tamanoFuente - 1);
             doc.setFont(undefined, "normal");
-            doc.text(`${fecha}`, 130, y);
+            doc.text(`${fecha}`, 125, y);
             y += 10;
         }
 
@@ -508,7 +632,7 @@
         doc.setFontSize(tamanoFuente);
         doc.setFont(undefined, "normal");
         doc.text("Base imponible.", 80, y);
-        doc.text(`% IVA (${porcentajeIVA}%)`, 145, y);
+        doc.text(`% IVA (${porcentajeIVA}%)`, 143, y);
         y += 10;
 
         // Textos iva
@@ -526,7 +650,7 @@
         y += 8;
 
         // Condiciones
-        doc.setFontSize(tamanoFuente - 3);
+        doc.setFontSize(tamanoFuente - 4);
         doc.text("Ticket obligatorio para cambios de 7 días después de la compra", 10, y);
         y += 8;
         doc.text("No se devuelve  el   dinero, se   canjea   por   un   vale  de   caja", 10, y);
