@@ -11,5 +11,4 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
     @Query("SELECT f.id FROM Factura f ORDER BY f.id DESC")
     List<Long> obtenerUltimaFacturaId();
 
-
 }

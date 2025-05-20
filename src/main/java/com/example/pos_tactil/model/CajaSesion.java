@@ -73,7 +73,7 @@ public class CajaSesion {
     }
 
     private Long generarNuevoId() {
-        // Este método maneja la asignación manual del ID.
+        // Este metodo maneja la asignación manual del ID.
         String sql = "SELECT MAX(id) FROM caja_sesion"; // Obtiene el ID máximo actual
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:pos_tactil.db");
              Statement stmt = conn.createStatement();
