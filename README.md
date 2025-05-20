@@ -1,9 +1,3 @@
-¡Excelente\! Incorporar iconos en el `README.md` lo hará más visual y fácil de digerir. Aquí tienes la versión formal con iconos de Font Awesome (asumiendo que los usarías si no estás ya usando Bootstrap Icons en el `README` mismo).
-
-Para los iconos en el `README.md`, se suelen usar los de [Shields.io](https://shields.io/) o emojis unicode, ya que los iconos de Bootstrap Icons o Font Awesome requieren la inclusión de CSS/JS, lo cual no es posible en un archivo `.md` renderizado en GitHub.
-
-He usado una combinación de emojis y algunos "badgets" (shields.io) para las tecnologías, que son comunes en READMEs.
-
 -----
 
 # Sistema de Punto de Venta Táctil (POS Táctil)
