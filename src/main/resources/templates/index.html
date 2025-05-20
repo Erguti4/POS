@@ -5,109 +5,323 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>POS Táctil</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"/>
 
-    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
     <link rel="stylesheet" href="/css/styles.css"/>
 
     <style>
+        /* Estilos generales del cuerpo */
         body {
-            background: linear-gradient(to bottom right, #ffe0b2, #fefefe); /* beige medio a blanco */
-            font-size: 1.3rem;
+            /* Usamos un fondo similar al de caja.html para consistencia, un gris claro y suave */
+            background-color: #eef1f5;
+            /* Se mantiene la fuente legible y moderna usada en caja.html */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Ajuste de tamaño de fuente base para mejor legibilidad en general */
+            font-size: 1.1rem;
+            /* Color de texto general más oscuro para contraste */
+            color: #333;
+            /* Centrar el contenido y asegurar que ocupe al menos la altura de la vista */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio para scroll si es necesario */
+            min-height: 100vh;
+            padding-top: 1rem; /* Espacio en la parte superior */
         }
 
+        /* Contenedor principal para mantener la coherencia*/
+        .main-container {
+            width: 95%;
+            max-width: 1600px; /* Ancho máximo para el contenedor principal */
+            background-color: #ffffff;
+            border-radius: 0.5rem; /* Bordes menos redondeados para consistencia con caja.html */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Sombra más sutil */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 85vh;
+            padding: 2rem; /* Añadir padding al contenedor principal */
+        }
+
+        /* Estilos para encabezados */
         h1, h3 {
-            font-weight: 700;
+            font-weight: 700; /* Negrita para destacar los títulos */
+            color: #2c3e50; /* Color de texto oscuro para los encabezados, tomado de caja.html */
         }
 
+        /* Estilos para tablas */
         .table {
             border-collapse: separate;
             border-spacing: 0;
-            border-radius: 1rem;
+            border-radius: 0.5rem; /* Bordes redondeados más sutiles, como en caja.html */
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Sombra similar a la de caja.html */
+            background-color: #fff; /* Fondo blanco para las tablas */
         }
 
+        /* Estilos para el encabezado de la tabla */
         .table thead th {
-            background-color: #ffb74d; /* tono naranja suave */
-            color: #212529;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #fff3e0;
-        }
-
-        .table tbody tr:nth-child(odd) {
-            background-color: #ffe0b2;
-        }
-
-        .table tbody tr:hover {
-            background-color: #ffe0b2;
-        }
-
-        .table td {
+            background-color: #2c3e50; /* Azul oscuro para el encabezado, tomado de caja.html */
+            color: #fff; /* Texto blanco en el encabezado para alto contraste */
             text-align: center;
             font-size: 1.1rem;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-
-
-        .panel-boton {
-            display: inline-block;
-            padding: 2rem 4rem;
-            background-color: #198754;
-            color: white;
-            border-radius: 1.5rem;
-            font-size: 2rem;
             font-weight: bold;
-            text-decoration: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transition: transform 0.2s ease;
-            margin-top: 10px;
+            border-bottom: 2px solid #2c3e50; /* Borde inferior oscuro */
+            padding: 1.2rem 1rem;
         }
 
-        .panel-boton:hover {
-            transform: scale(1.05);
-            background-color: #157347;
-            text-decoration: none;
-            color: white;
+        /* Estilos para filas de la tabla */
+        .table tbody tr {
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
+        /* Estilos para filas pares */
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Fondo más claro para filas pares, similar a caja.html */
+        }
+
+        /* Estilos para filas impares */
+        .table tbody tr:nth-child(odd) {
+            background-color: #ffffff; /* Fondo blanco para filas impares */
+        }
+
+        /* Estilos para filas al pasar el ratón por encima */
+        .table tbody tr:hover {
+            background-color: #e9ecef; /* Un gris muy claro al pasar el ratón, similar a caja.html */
+            transform: translateY(-3px); /* Ligero levantamiento al pasar el ratón */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); /* Sombra sutil al hacer hover */
+        }
+
+        /* Estilos para celdas de la tabla */
+        .table td {
+            text-align: center;
+            font-size: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6; /* Borde inferior suave, tomado de caja.html */
+        }
+
+        /* Contenedor para centrar los botones de caja */
         .cerrar-caja-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 20px; /* Espacio entre los botones */
+        }
+
+        /* Estilos generales para los botones de acción (Abir/Cerrar/Volver Caja) */
+        .panel-boton {
+            display: inline-flex; /* Usar flex para centrar contenido verticalmente */
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.5rem; /* Padding ajustado para un mejor aspecto */
+            color: white;
+            border-radius: 0.5rem; /* Bordes menos redondeados para consistencia con caja.html */
+            font-size: 1.4rem; /* Tamaño de fuente ligeramente reducido */
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            margin: 10px; /* Margen para separar los botones */
+            min-width: 200px; /* Ancho mínimo para mantener la consistencia */
+            gap: 0.5rem; /* Espacio entre icono y texto */
+        }
+
+        .panel-boton:hover {
+            transform: translateY(-3px); /* Levantamiento más pronunciado al pasar el ratón */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Colores específicos para los botones */
+        #abrirCaja {
+            background-color: #27ae60; /* Verde de éxito, tomado de caja.html */
+        }
+        #abrirCaja:hover {
+            background-color: #229954;
         }
 
         #cerrarCaja {
+            background-color: #dc3545; /* Rojo de peligro */
+        }
+        #cerrarCaja:hover {
+            background-color: #c82333;
+        }
+
+        #volverCaja {
+            background-color: #ffc107; /* Amarillo de advertencia */
+            color: #212529; /* Texto oscuro para el botón de advertencia */
+        }
+        #volverCaja:hover {
+            background-color: #e0a800;
+        }
+
+        /* Oculta el botón de cerrar caja y volver por defecto (controlado por JS) */
+        /* Importante: el display será gestionado por JS para asegurar la lógica */
+        #cerrarCaja, #volverCaja {
             display: none;
+        }
+
+
+        /* Estilos para el navegador/navbar */
+        .navbar {
+            border-radius: 0.5rem !important; /* Bordes más sutiles para la navbar */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08) !important; /* Sombra más suave */
+            background-color: #2c3e50 !important; /* Fondo oscuro para la navbar, tomado de caja.html */
+        }
+
+        .navbar-brand {
+            font-size: 2rem !important; /* Tamaño de fuente ajustado para la marca */
+            color: white !important; /* Color blanco para la marca */
+            font-weight: bold;
+        }
+        .navbar-brand .bi {
+            color: #3498db !important; /* Icono con un color distintivo */
+        }
+
+
+        .navbar-nav .btn {
+            font-size: 0.95rem; /* Ajuste del tamaño de fuente para los botones de la navbar */
+            padding: 0.7rem 1.2rem; /* Padding ajustado para los botones de la navbar */
+            margin-left: 10px !important; /* Margen entre botones */
+        }
+        /* Estilos específicos para los botones de la navbar para que coincidan con los de caja.html */
+        .navbar .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529; /* Texto oscuro para el botón de advertencia */
+        }
+        .navbar .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+        .navbar .btn-info {
+            background-color: #17a2b8; /* Un azul claro */
+            border-color: #17a2b8;
+        }
+        .navbar .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+        }
+        .navbar .btn-primary {
+            background-color: #3498db; /* Azul primario, tomado de caja.html */
+            border-color: #3498db;
+        }
+        .navbar .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+
+        /* Estilos para los botones de paginación */
+        .btn-outline-secondary {
+            border-color: #6c757d; /* Borde gris oscuro */
+            color: #6c757d; /* Texto gris oscuro */
+            font-weight: bold;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d; /* Fondo gris oscuro al hacer hover */
+            color: #fff; /* Texto blanco al hacer hover */
+        }
+
+        /* Animaciones para los botones de caja al cargar */
+        #abrirCaja, #cerrarCaja, #volverCaja {
+            animation-duration: 0.8s; /* Duración de la animación ligeramente más rápida */
+            animation-delay: 0.5s; /* Retraso para que aparezcan después del contenido principal */
+        }
+
+        /* Estilos para la sección de resumen de cajas */
+        .summary-section {
+            background-color: #fdfdfd; /* Fondo claro para la sección de resumen */
+            padding: 0rem 2.5rem 2.5rem 2.5rem;
+            border-radius: 0.5rem; /* Bordes más sutiles */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Sombra sutil */
+            margin-bottom: 2rem; /* Espacio inferior */
+        }
+
+        /* Estilos para el mensaje de bienvenida */
+        .welcome-section {
+            margin-bottom: 2rem;
+            text-align: center; /* Centrar el texto */
+        }
+
+        .welcome-section h1 {
+            font-size: 3rem; /* Tamaño de fuente más grande para el título de bienvenida */
+            margin-bottom: 1rem;
+            color: #212529;
+            font-weight: bold;
+        }
+
+        .welcome-section p {
+            font-size: 1.3rem; /* Tamaño de fuente para el subtítulo de bienvenida */
+            color: #555;
+            max-width: 800px; /* Limitar el ancho del párrafo para mejor legibilidad */
+            margin: 0 auto; /* Centrar el párrafo */
+        }
+
+        /* Media queries para responsividad, adaptadas de caja.html */
+        @media (max-width: 992px) {
+            .main-container {
+                padding: 1rem; /* Reducir padding en pantallas más pequeñas */
+            }
+            .welcome-section h1 {
+                font-size: 2.5rem;
+            }
+            .welcome-section p {
+                font-size: 1.1rem;
+            }
+            .panel-boton {
+                font-size: 1.2rem;
+                padding: 1rem 2rem;
+                min-width: 180px;
+            }
+            .navbar-brand {
+                font-size: 1.7rem !important;
+            }
+            .navbar-nav .btn {
+                margin-left: 0 !important;
+                margin-top: 5px;
+                width: 100%; /* Ocupar todo el ancho disponible */
+            }
+            .d-flex.justify-content-center.mt-4 {
+                flex-direction: column; /* Apilar botones de paginación en pantallas pequeñas */
+                gap: 10px;
+            }
+            .d-flex.justify-content-center.mt-4 button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+            .welcome-section p {
+                font-size: 1rem;
+            }
+            .panel-boton {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+                min-width: 150px;
+            }
+            .table thead th, .table tbody td {
+                font-size: 0.9rem; /* Ajustar el tamaño de fuente de la tabla */
+                padding: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container py-5">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg shadow-sm bg-light px-4 py-3 rounded mb-4">
-        <a class="navbar-brand d-flex align-items-center fs-2 fw-bold text-success" href="#">
-            <i class="bi bi-clipboard2-check me-2"></i> POS Táctil
+<div class="container py-5 main-container">
+    <nav class="navbar navbar-expand-lg shadow-sm px-4 py-3 rounded mb-4">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <i class="bi bi-shop me-2"></i> POS Táctil
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
                 aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,37 +330,29 @@
 
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto">
-                <!-- Otras opciones de navegación aquí -->
             </ul>
 
-            <!-- Botón para personalizar ticket -->
-            <a href="personalizar-ticket.html" class="btn btn-warning ms-3 my-2 my-lg-0">
+            <a href="personalizar-ticket.html" class="btn btn-warning ms-lg-3 my-2 my-lg-0">
                 <i class="bi bi-paint-bucket me-2"></i> Personalizar Ticket
             </a>
 
-            <!-- Botón para productos -->
-            <a href="productos.html" class="btn btn-info ms-3 my-2 my-lg-0">
+            <a href="productos.html" class="btn btn-info ms-lg-3 my-2 my-lg-0">
                 <i class="bi bi-boxes me-2"></i> Productos
             </a>
 
-            <!-- Botón para ver todas las facturas -->
-            <a href="ver-facturas.html" class="btn btn-primary ms-3 my-2 my-lg-0">
+            <a href="ver-facturas.html" class="btn btn-primary ms-lg-3 my-2 my-lg-0">
                 <i class="bi bi-file-earmark-text me-2"></i> Ver Facturas
             </a>
         </div>
     </nav>
 
-
-
-    <!-- Encabezado -->
-    <div class="text-center animate__animated animate__fadeIn animate__delay-1s">
+    <div class="animate__animated animate__fadeIn animate__delay-1s welcome-section">
         <h1 class="display-3 mb-3">Bienvenido</h1>
         <p class="lead fs-4">Gestiona tus ventas con una interfaz adaptada para pantallas táctiles.</p>
     </div>
 
-    <!-- Resumen de Cajas -->
-    <div class="mt-5 animate__animated animate__fadeInUp">
-        <h3 class="mb-3">Cajas Anteriores</h3>
+    <div class="animate__animated animate__fadeInUp summary-section">
+        <h3 class="mb-4 text-center">Cajas Anteriores</h3>
         <div class="table-responsive">
             <table class="table table-hover border">
                 <thead>
@@ -155,72 +361,77 @@
                     <th>Fecha Apertura</th>
                     <th>Fecha Cierre</th>
                     <th>Total Ventas</th>
-                </tr>
+                    <th>Acciones</th> </tr>
                 </thead>
                 <tbody id="resumenCajas">
-                <!-- Se rellenará dinámicamente -->
                 </tbody>
             </table>
         </div>
-        <div class="d-flex justify-content-center mt-3">
-            <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-3">←</button>
-            <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-3">→</button>
+        <div class="d-flex justify-content-center mt-4">
+            <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-4">
+                <i class="bi bi-arrow-left-circle me-2"></i> Anterior
+            </button>
+            <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-4">
+                Siguiente <i class="bi bi-arrow-right-circle ms-2"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Botones Abrir, Cerrar y Volver a Caja -->
     <div class="cerrar-caja-container">
-        <button id="abrirCaja" class="panel-boton animate__animated">Abrir Caja</button>
-        <button id="cerrarCaja" class="panel-boton animate__animated">Cerrar Caja</button>
-        <button id="volverCaja" class="panel-boton animate__animated btn-warning" style="display: none;">Volver a la Caja</button>
+        <button id="abrirCaja" class="panel-boton animate__animated animate__fadeInUp">
+            <i class="bi bi-box-arrow-in-right"></i> Abrir Caja
+        </button>
+        <button id="cerrarCaja" class="panel-boton animate__animated animate__fadeInUp">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Caja
+        </button>
+        <button id="volverCaja" class="panel-boton animate__animated animate__fadeInUp" style="display: none;">
+            <i class="bi bi-cash-stack"></i> Volver a la Caja
+        </button>
     </div>
 
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let cajaAbierta = false;
-    let todasLasCajas = [];
-    let paginaActual = 0;
-    const cajasPorPagina = 5;
+    let cajaAbierta = false; // Variable para controlar el estado de la caja
+    let todasLasCajas = []; // Almacena todas las sesiones de caja obtenidas de la API
+    let paginaActual = 0; // Índice de la página actual de la tabla
+    const cajasPorPagina = 5; // Número de cajas a mostrar por página
 
+    // Espera a que el DOM esté completamente cargado antes de ejecutar el script
     document.addEventListener("DOMContentLoaded", () => {
-        fetch('/api/caja')
-            .then(response => response.json())
-            .then(data => {
-                todasLasCajas = data.reverse(); // Guardamos todas las cajas ordenadas
-                mostrarPagina(paginaActual);
-            })
-            .catch(err => {
-                console.error("Error al cargar sesiones de caja:", err);
-            });
+        // Carga las sesiones de caja desde la API al iniciar la página
+        fetchCajas(); // Call the new fetch function
 
+        // Event listener para el botón de página anterior
         document.getElementById("prevPagina").addEventListener("click", () => {
             if (paginaActual > 0) {
-                paginaActual--;
-                mostrarPagina(paginaActual);
+                paginaActual--; // Decrementa la página actual
+                mostrarPagina(paginaActual); // Vuelve a renderizar la tabla
             }
         });
 
+        // Event listener para el botón de página siguiente
         document.getElementById("sigPagina").addEventListener("click", () => {
-            const totalPaginas = Math.ceil(todasLasCajas.length / cajasPorPagina);
+            const totalPaginas = Math.ceil(todasLasCajas.length / cajasPorPagina); // Calcula el total de páginas
             if (paginaActual < totalPaginas - 1) {
-                paginaActual++;
-                mostrarPagina(paginaActual);
+                paginaActual++; // Incrementa la página actual
+                mostrarPagina(paginaActual); // Vuelve a renderizar la tabla
             }
         });
 
+        // Event listener para el botón "Abrir Caja"
         document.getElementById("abrirCaja").addEventListener("click", () => {
             if (cajaAbierta) {
-                alert("Ya hay una caja abierta.");
+                alert("Ya hay una caja abierta."); // Evita abrir múltiples cajas
                 return;
             }
+            // Realiza una solicitud POST para abrir una nueva caja
             fetch('/api/caja/abrir', { method: 'POST' })
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = "/caja.html";
+                        window.location.href = "/caja.html"; // Redirige a la página de caja si la apertura es exitosa
                     } else {
                         alert("No se puede abrir una nueva caja. Es posible que ya haya una abierta.");
                     }
@@ -231,81 +442,148 @@
                 });
         });
 
+        // Event listener para el botón "Volver a la Caja"
         document.getElementById("volverCaja").addEventListener("click", () => {
-            window.location.href = "/caja.html";
+            window.location.href = "/caja.html"; // Redirige a la página de caja actual
         });
 
-
+        // Event listener para el botón "Cerrar Caja"
         document.getElementById("cerrarCaja").addEventListener("click", () => {
             let totalFactura = 0;
-            if (typeof productos !== 'undefined' && Array.isArray(productos)) {
-                totalFactura = productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+            // Get the total from the currently open cash register if available
+            const cajaActual = todasLasCajas.find(c => c.estado === 'ABIERTA');
+            if (cajaActual) {
+                totalFactura = cajaActual.totalVentas || 0;
             }
 
+            if (totalFactura === 0) {
+                alert("No se guardará la caja porque el total de ventas es 0.");
+                fetchCajas(); // Just refresh the table to reflect the unchanged state
+                return;
+            }
+
+            // Realiza una solicitud POST para cerrar la caja, pasando el total de ventas
             fetch(`/api/caja/cerrar?totalVentas=${totalFactura.toFixed(2)}`, {
                 method: 'POST'
             })
                 .then(response => {
                     if (response.ok) {
                         alert("Caja cerrada correctamente.");
-                        cajaAbierta = false;
-                        document.getElementById("cerrarCaja").style.display = 'none';
-                        return fetch('/api/caja');
+                        cajaAbierta = false; // Actualiza el estado de la caja
+                        fetchCajas(); // After closing, reload the boxes to update the table and buttons
                     } else {
                         alert("Error al cerrar la caja.");
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    todasLasCajas = data.reverse();
-                    paginaActual = 0;
-                    mostrarPagina(paginaActual);
-                })
                 .catch(err => {
-                    console.error("Error al actualizar la tabla de cajas:", err);
+                    console.error("Error al cerrar la caja:", err);
+                    alert("Error al cerrar la caja.");
                 });
         });
     });
 
+    function fetchCajas() {
+        fetch('/api/caja')
+            .then(response => response.json()) // Convierte la respuesta a formato JSON
+            .then(data => {
+                todasLasCajas = data.reverse(); // Almacena y revierte el orden para mostrar las más recientes primero
+                paginaActual = 0; // Reset to first page after fetching
+                mostrarPagina(paginaActual); // Muestra la primera página de cajas
+            })
+            .catch(err => {
+                console.error("Error al cargar sesiones de caja:", err); // Captura y registra errores
+            });
+    }
+
+    // Función para mostrar una página específica de cajas en la tabla
     function mostrarPagina(pagina) {
         const tabla = document.getElementById("resumenCajas");
-        tabla.innerHTML = "";
+        tabla.innerHTML = ""; // Limpia el contenido actual de la tabla
 
-        const inicio = pagina * cajasPorPagina;
-        const fin = inicio + cajasPorPagina;
-        const cajasPagina = todasLasCajas.slice(inicio, fin);
+        const inicio = pagina * cajasPorPagina; // Calcula el índice de inicio de la página
+        const fin = inicio + cajasPorPagina; // Calcula el índice de fin de la página
+        const cajasPagina = todasLasCajas.slice(inicio, fin); // Extrae las cajas para la página actual
+
+        cajaAbierta = false; // Resetear el estado de caja abierta para la página actual
+        let foundOpenBox = false; // Bandera para saber si encontramos una caja abierta
 
         cajasPagina.forEach((caja, index) => {
             const row = document.createElement("tr");
 
-            // Añadir clase de animación a cada fila con retraso
-            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index}s`);
+            // Añadir clase de animación a cada fila con un retraso escalonado
+            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index * 0.05}s`); /* Animación con retraso para cada fila */
 
-
-            const id = caja.id.toString().padStart(4, '0');
-            const fechaApertura = new Date(caja.fechaApertura).toLocaleString();
+            // Formatea los datos de la caja para su visualización
+            const id = caja.id.toString().padStart(4, '0'); // Formatea el ID con ceros iniciales
+            const fechaApertura = new Date(caja.fechaApertura).toLocaleString(); // Formatea la fecha de apertura
             const fechaCierre = caja.fechaCierre
                 ? new Date(caja.fechaCierre).toLocaleString()
-                : "—";
+                : "—"; // Muestra "—" si la caja no está cerrada
             const total = caja.totalVentas != null
                 ? `${parseFloat(caja.totalVentas).toFixed(2)}€`
-                : "—";
+                : "—"; // Muestra "—" si no hay ventas
 
+            // Inserta los datos en la fila de la tabla
             row.innerHTML = `
             <td>${id}</td>
             <td>${fechaApertura}</td>
             <td>${fechaCierre}</td>
             <td>${total}</td>
+            <td>
+                <button class="btn btn-danger btn-sm delete-caja" data-id="${caja.id}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
         `;
-            tabla.appendChild(row);
+            tabla.appendChild(row); // Añade la fila a la tabla
 
+            // Detectar si hay alguna caja abierta en la lista completa de cajas
             if (caja.estado === 'ABIERTA') {
-            cajaAbierta = true;
-            document.getElementById("cerrarCaja").style.display = 'inline-block';
-            document.getElementById("volverCaja").style.display = 'inline-block';
+                foundOpenBox = true;
+            }
+        });
+
+        // Add event listeners to the new delete buttons
+        document.querySelectorAll('.delete-caja').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const cajaId = event.currentTarget.dataset.id;
+                if (confirm(`¿Estás seguro de que quieres eliminar la caja #${cajaId}?`)) {
+                    fetch(`/api/caja/${cajaId}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert("Caja eliminada correctamente.");
+                                fetchCajas(); // Reload the boxes to update the table
+                            } else {
+                                alert("Error al eliminar la caja.");
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error al eliminar la caja:", err);
+                            alert("Error al eliminar la caja.");
+                        });
+                }
+            });
+        });
+
+        // Lógica de visibilidad de los botones basada en si hay *alguna* caja abierta en el sistema (no solo en la página actual)
+        if (foundOpenBox) {
+            document.getElementById("cerrarCaja").style.display = 'inline-flex';
+            document.getElementById("volverCaja").style.display = 'inline-flex';
+            document.getElementById("abrirCaja").style.display = 'none';
+        } else {
+            document.getElementById("cerrarCaja").style.display = 'none';
+            document.getElementById("volverCaja").style.display = 'none';
+            document.getElementById("abrirCaja").style.display = 'inline-flex';
         }
 
-        });
+        // Si todasLasCajas está vacío (no hay datos de cajas), mostrar solo "Abrir Caja"
+        if (todasLasCajas.length === 0) {
+            document.getElementById("abrirCaja").style.display = 'inline-flex';
+            document.getElementById("cerrarCaja").style.display = 'none';
+            document.getElementById("volverCaja").style.display = 'none';
+        }
     }
 </script>
 

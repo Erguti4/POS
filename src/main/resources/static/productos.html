@@ -3,230 +3,674 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Productos</title>
+    <title>Gestión de Productos</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"/>
 
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="/css/styles.css"/>
-
     <style>
+        /* Estilos generales del cuerpo */
         body {
-            background: linear-gradient(to bottom right, #ffe0b2, #fefefe);
-            font-size: 1.3rem;
+            background-color: #eef1f5; /* Un gris claro de fondo, consistente con los otros archivos */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.95rem;
+            color: #333;
+            display: flex;
+            flex-direction: column; /* Organiza el contenido en columna */
+            justify-content: flex-start; /* Alinea el contenido al principio */
+            align-items: center; /* Centra horizontalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem; /* Padding general */
         }
 
-        h1, h3 {
-            font-weight: 700;
+        /* Contenedor principal de la aplicación */
+        .container-fluid {
+            width: 98%;
+            max-width: 1400px; /* Ancho máximo para el contenedor */
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 0.8rem; /* Bordes más redondeados */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+            margin-top: 1rem;
+        }
+
+        /* Títulos */
+        h1, h2 {
+            font-weight: bold;
+            color: #2c3e50; /* Color de encabezado consistente */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Botones principales de acción (Crear, Volver) */
+        .btn-primary {
+            background-color: #27ae60; /* Verde de éxito para acciones principales */
+            border-color: #27ae60;
+            font-size: 1.1rem;
+            padding: 0.75rem 2rem;
+            border-radius: 0.3rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #229954;
+            border-color: #229954;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d; /* Gris estándar de Bootstrap para secundario */
+            border-color: #6c757d;
+            font-size: 1rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.3rem;
+            color: white;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        /* Contenedor de búsqueda y botones */
+        .search-controls {
+            background-color: #f8f9fa; /* Fondo claro para la sección de control */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+            display: flex;
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+            gap: 1rem; /* Espacio entre elementos */
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #buscarProductoInput {
+            flex-grow: 1; /* Permite que el input crezca */
+            max-width: 400px; /* Ancho máximo para el input de búsqueda */
+            padding: 0.6rem 1rem;
+            border-radius: 0.3rem;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+        }
+
+        /* Tabla de productos */
+        .table-responsive {
+            margin-top: 2rem;
         }
 
         .table {
             border-collapse: separate;
             border-spacing: 0;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 0.8rem; /* Bordes redondeados para la tabla */
+            overflow: hidden; /* Asegura que los bordes redondeados se apliquen */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Sombra suave para la tabla */
+            background-color: #ffffff;
         }
 
-        .table thead th {
-            background-color: #ffb74d;
-            color: #212529;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-bottom: 2px solid #e0e0e0;
+        .table thead {
+            background-color: #2c3e50; /* Azul oscuro para el encabezado de la tabla */
+            color: white;
+        }
+
+        .table th {
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap; /* Evita que el texto se rompa */
         }
 
         .table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #fff3e0;
-        }
-
-        .table tbody tr:nth-child(odd) {
-            background-color: #ffe0b2;
+            transition: background-color 0.2s ease;
         }
 
         .table tbody tr:hover {
-            background-color: #ffe0b2;
+            background-color: #f2f4f7; /* Color de fondo al pasar el ratón */
         }
 
         .table td {
-            text-align: center;
+            padding: 0.8rem 1.2rem;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.95rem;
+        }
+
+        /* Estilo para las filas impares de la tabla (cebreado) */
+        .table tbody tr:nth-child(odd) {
+            background-color: #fdfdfe; /* Blanco muy ligero */
+        }
+
+        /* Columna de acciones en la tabla */
+        .table td.actions-cell {
+            white-space: nowrap; /* Evita el salto de línea en los botones */
+            width: 1%; /* Intenta que la columna sea lo más pequeña posible */
+        }
+
+        /* Columnas de acciones en la tabla */
+        .table td .btn {
+            padding: 0.4rem 0.7rem;
+            font-size: 0.85rem;
+            border-radius: 0.25rem;
+            margin-right: 0.3rem; /* Espacio entre botones */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .table td .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-info {
+            background-color: #3498db; /* Azul para editar */
+            border-color: #3498db;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c; /* Rojo para eliminar */
+            border-color: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        /* Paginación */
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pagination-container .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.3rem;
+            font-size: 1rem;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            color: #333;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .pagination-container .btn:hover:not(.active) {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+        }
+
+        .pagination-container .btn.active {
+            background-color: #3498db; /* Azul para la página activa */
+            border-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Estilos del Modal */
+        .modal-content {
+            border-radius: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .modal-header {
+            background-color: #3498db;
+            color: white;
+            border-bottom: none;
+            border-top-left-radius: 0.8rem;
+            border-top-right-radius: 0.8rem;
+        }
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%); /* Icono de cierre blanco */
+        }
+        .modal-body label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        .modal-body input.form-control,
+        .modal-body textarea.form-control {
+            border-radius: 0.3rem;
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            box-shadow: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .modal-body input.form-control:focus,
+        .modal-body textarea.form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+        .modal-footer {
+            border-top: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+        }
+        .modal-footer .btn-primary {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .modal-footer .btn-primary:hover {
+            background-color: #229954;
+            border-color: #229954;
+        }
+        .modal-footer .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .modal-footer .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+
+        /* Botón de "Volver a la tienda" */
+        .back-to-store-btn {
+            margin-top: 2rem;
+            background-color: #f8f9fa; /* Fondo claro */
+            border: 1px solid #ced4da; /* Borde suave */
+            color: #333; /* Texto oscuro */
             font-size: 1.1rem;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.75rem 2rem;
+            border-radius: 0.3rem;
+            text-decoration: none; /* Quitar subrayado del enlace */
+            display: inline-flex; /* Para alinear el icono y el texto */
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .back-to-store-btn:hover {
+            background-color: #e9ecef;
+            color: #111;
+            border-color: #adb5bd;
+        }
+
+        /* Ajustes responsivos */
+        @media (max-width: 992px) {
+            .container-fluid {
+                padding: 1.5rem;
+            }
+            .table th, .table td {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .table td .btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            #buscarProductoInput {
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+            .search-controls .btn-primary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1, h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            .container-fluid {
+                padding: 1rem;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .table thead {
+                display: none; /* Oculta el encabezado de la tabla en móviles */
+            }
+            .table tbody, .table tr, .table td {
+                display: block; /* Hace que las filas y celdas se comporten como bloques */
+                width: 100%;
+            }
+            .table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                padding: 0.8rem;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            }
+            .table td {
+                text-align: right;
+                padding-left: 50%; /* Espacio para la etiqueta */
+                position: relative;
+                border: none;
+                padding-bottom: 0.5rem;
+                padding-top: 0.2rem;
+            }
+            .table td::before {
+                content: attr(data-label); /* Usa el atributo data-label como etiqueta */
+                position: absolute;
+                left: 0.8rem;
+                width: calc(50% - 1.2rem);
+                padding-right: 1rem;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            .table td.actions-cell {
+                text-align: center;
+                padding-left: 0;
+                margin-top: 0.5rem;
+                border-top: 1px dashed #eee;
+            }
+            .table td.actions-cell::before {
+                display: none; /* Oculta la etiqueta para la celda de acciones */
+            }
         }
     </style>
 </head>
 <body>
-<div class="container py-5">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg shadow-sm bg-light px-4 py-3 rounded mb-4">
-        <a class="navbar-brand d-flex align-items-center fs-2 fw-bold text-success" href="#">
-            <i class="bi bi-box-seam me-2"></i> Productos
-        </a>
-        <a href="/" class="btn btn-primary ms-auto my-2 my-lg-0">
-            <i class="bi bi-arrow-left ms-2 fs-4"></i>
-        </a>
 
-    </nav>
+<div class="container-fluid animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4">Gestión de Productos</h1>
 
-
-    <!-- Encabezado -->
-    <div class="text-center animate__animated animate__fadeIn animate__delay-1s">
-        <h1 class="display-3 mb-3">Gestión de Productos</h1>
-        <p class="lead fs-4">Visualiza y actualiza los productos registrados en la tienda.</p>
+    <div class="search-controls animate__animated animate__fadeInDown">
+        <input type="text" id="buscarProductoInput" class="form-control" placeholder="Buscar por código o nombre...">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
+            <i class="bi bi-plus-circle me-2"></i> Crear Producto
+        </button>
     </div>
 
-    <!-- Productos -->
-    <div class="mt-5 animate__animated animate__fadeInUp">
-        <h3 class="mb-3">Lista de Productos</h3>
-        <div class="table-responsive">
-            <table class="table table-hover border">
-                <thead>
-                <tr>
-                    <th>Código de Barra</th>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-                <tbody id="productosLista">
-                <!-- Se rellenará dinámicamente -->
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive animate__animated animate__fadeInUp">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Código de Barras</th>
+                <th>Nombre</th>
+                <th>Precio (€)</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="productosTablaBody">
+            </tbody>
+        </table>
     </div>
 
-    <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-3">
-        <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-3">←</button>
-        <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-3">→</button>
+    <div class="pagination-container" id="paginationControls">
+    </div>
+
+    <div class="text-center">
+        <a href="/" class="btn back-to-store-btn animate__animated animate__fadeInUp">
+            <i class="bi bi-arrow-left-circle me-2"></i> Volver a la Tienda
+        </a>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
+<div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productoModalLabel">Crear Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productoId"> <div class="mb-3">
+                <label for="codigoBarra" class="form-label">Código de Barras</label>
+                <input type="text" class="form-control" id="codigoBarra" placeholder="Ingrese el código de barras" required>
+            </div>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre del Producto</label>
+                    <input type="text" class="form-control" id="nombre" placeholder="Ingrese el nombre del producto" required>
+                </div>
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio (€)</label>
+                    <input type="number" class="form-control" id="precio" step="0.01" min="0" placeholder="Ingrese el precio" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarProducto()">Guardar Producto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let productos = [];
-    let paginaActual = 0;
-    const productosPorPagina = 6;
+    // ====================================================================================
+    // VARIABLES GLOBALES
+    // ====================================================================================
+    let productos = []; // Almacena todos los productos cargados del servidor
+    let paginaActual = 0; // Controla la página actual de la tabla
+    const productosPorPagina = 5; // Número de productos a mostrar por página
+    let productosFiltrados = []; // Almacena los productos después de aplicar un filtro de búsqueda
 
-    document.addEventListener("DOMContentLoaded", () => {
-        fetch('/productos')
-            .then(response => response.json())
-            .then(data => {
-                productos = data; // Guardamos los productos
-                mostrarPagina(paginaActual);
-            })
-            .catch(err => {
-                console.error("Error al cargar productos:", err);
-            });
+    // ====================================================================================
+    // MANEJO DEL MODAL (Crear/Editar Producto)
+    // ====================================================================================
+    const productoModal = new bootstrap.Modal(document.getElementById('productoModal'));
+    const productoModalLabel = document.getElementById('productoModalLabel');
+    const productoIdInput = document.getElementById('productoId');
+    const codigoBarraInput = document.getElementById('codigoBarra');
+    const nombreInput = document.getElementById('nombre');
+    const precioInput = document.getElementById('precio');
 
-        document.getElementById("prevPagina").addEventListener("click", () => {
-            if (paginaActual > 0) {
-                paginaActual--;
-                mostrarPagina(paginaActual);
+    // Limpia y prepara el modal para crear un nuevo producto
+    document.getElementById('productoModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Botón que disparó el modal
+        const isEdit = button && button.getAttribute('data-bs-whatever') === 'edit';
+
+        if (isEdit) {
+            // Si es edición, se rellenan los campos
+            productoModalLabel.textContent = 'Editar Producto';
+            const productoToEdit = productos.find(p => p.id == button.getAttribute('data-product-id'));
+            if (productoToEdit) {
+                productoIdInput.value = productoToEdit.id;
+                codigoBarraInput.value = productoToEdit.codigoBarra;
+                nombreInput.value = productoToEdit.nombre;
+                precioInput.value = productoToEdit.precio;
+                codigoBarraInput.readOnly = true; // No permitir cambiar el código de barras en edición
             }
-        });
-
-        document.getElementById("sigPagina").addEventListener("click", () => {
-            const totalPaginas = Math.ceil(productos.length / productosPorPagina);
-            if (paginaActual < totalPaginas - 1) {
-                paginaActual++;
-                mostrarPagina(paginaActual);
-            }
-        });
+        } else {
+            // Si es creación, se resetean los campos
+            productoModalLabel.textContent = 'Crear Producto';
+            productoIdInput.value = '';
+            codigoBarraInput.value = '';
+            nombreInput.value = '';
+            precioInput.value = '';
+            codigoBarraInput.readOnly = false; // Permitir escribir el código de barras
+        }
     });
 
+    // ====================================================================================
+    // CARGA INICIAL DE DATOS
+    // ====================================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarProductos(); // Carga todos los productos al iniciar
+        // Listener para el input de búsqueda
+        document.getElementById('buscarProductoInput').addEventListener('input', filtrarProductos);
+    });
+
+    function cargarProductos() {
+        fetch('/productos') // Endpoint para obtener todos los productos
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error HTTP! estado: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                productos = data; // Almacena todos los productos
+                productosFiltrados = [...productos]; // Inicializa los productos filtrados con todos
+                mostrarPagina(0); // Muestra la primera página
+                generarControlesPaginacion(); // Genera los botones de paginación
+            })
+            .catch(error => console.error('Error al cargar los productos:', error));
+    }
+
+    // ====================================================================================
+    // PAGINACIÓN Y VISUALIZACIÓN DE LA TABLA
+    // ====================================================================================
     function mostrarPagina(pagina) {
-        const tabla = document.getElementById("productosLista");
-        tabla.innerHTML = "";
+        paginaActual = pagina;
+        const tablaBody = document.getElementById('productosTablaBody');
+        tablaBody.innerHTML = ''; // Limpia la tabla actual
 
         const inicio = pagina * productosPorPagina;
         const fin = inicio + productosPorPagina;
-        const productosPagina = productos.slice(inicio, fin);
+        const productosPagina = productosFiltrados.slice(inicio, fin); // Obtiene los productos de la página actual
 
         productosPagina.forEach((producto, index) => {
-            const row = document.createElement("tr");
-
-            // Añadir clase de animación a cada fila con retraso
-            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index}s`);
+            const row = document.createElement('tr');
+            // Añadir clase de animación a cada fila con un ligero retraso
+            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index * 0.05}s`);
 
             row.innerHTML = `
-                <td>${producto.codigoBarra}</td>
-                <td><input type="text" value="${producto.nombre}" class="form-control" onchange="actualizarProducto('${producto.codigoBarra}', 'nombre', this.value)"/></td>
-                <td><input type="number" value="${producto.precio}" class="form-control" onchange="actualizarProducto('${producto.codigoBarra}', 'precio', this.value)"/></td>
-                <td>
-                    <button class="btn btn-info" onclick="guardarProducto('${producto.codigoBarra}')">Guardar</button>
-                    <button class="btn btn-danger" onclick="eliminarProducto('${producto.codigoBarra}')">Borrar</button>
+                <td data-label="Código">${producto.codigoBarra}</td>
+                <td data-label="Nombre">${producto.nombre}</td>
+                <td data-label="Precio">${parseFloat(producto.precio).toFixed(2)}€</td>
+                <td class="actions-cell">
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#productoModal" data-bs-whatever="edit" data-product-id="${producto.id}">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarProducto('${producto.codigoBarra}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
                 </td>
             `;
-            tabla.appendChild(row);
+            tablaBody.appendChild(row);
         });
+
+        generarControlesPaginacion(); // Regenera los controles de paginación
     }
 
-    function actualizarProducto(codigoBarra, campo, valor) {
-        // Lógica para actualizar el producto en el frontend
-        const producto = productos.find(p => p.codigoBarra === codigoBarra);
-        if (producto) {
-            producto[campo] = valor;
+    function generarControlesPaginacion() {
+        const paginationContainer = document.getElementById('paginationControls');
+        paginationContainer.innerHTML = ''; // Limpia los controles actuales
+
+        const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
+
+        // Botón "Anterior"
+        const btnPrev = document.createElement('button');
+        btnPrev.classList.add('btn', 'btn-secondary');
+        btnPrev.innerHTML = `<i class="bi bi-chevron-left"></i>`;
+        btnPrev.disabled = paginaActual === 0;
+        btnPrev.onclick = () => mostrarPagina(paginaActual - 1);
+        paginationContainer.appendChild(btnPrev);
+
+        // Números de página
+        for (let i = 0; i < totalPaginas; i++) {
+            const btnPage = document.createElement('button');
+            btnPage.classList.add('btn', 'btn-secondary');
+            btnPage.textContent = i + 1;
+            if (i === paginaActual) {
+                btnPage.classList.add('active'); // Marca la página actual como activa
+            }
+            btnPage.onclick = () => mostrarPagina(i);
+            paginationContainer.appendChild(btnPage);
         }
+
+        // Botón "Siguiente"
+        const btnNext = document.createElement('button');
+        btnNext.classList.add('btn', 'btn-secondary');
+        btnNext.innerHTML = `<i class="bi bi-chevron-right"></i>`;
+        btnNext.disabled = paginaActual === totalPaginas - 1 || totalPaginas === 0;
+        btnNext.onclick = () => mostrarPagina(paginaActual + 1);
+        paginationContainer.appendChild(btnNext);
     }
 
-    function guardarProducto(codigoBarra) {
-        const producto = productos.find(p => p.codigoBarra === codigoBarra);
-        if (producto) {
-            fetch(`/productos/${codigoBarra}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(producto),
+    // ====================================================================================
+    // FILTRADO DE PRODUCTOS
+    // ====================================================================================
+    function filtrarProductos() {
+        const searchTerm = document.getElementById('buscarProductoInput').value.toLowerCase();
+        productosFiltrados = productos.filter(producto =>
+            producto.nombre.toLowerCase().includes(searchTerm) ||
+            producto.codigoBarra.toLowerCase().includes(searchTerm)
+        );
+        mostrarPagina(0); // Vuelve a la primera página con los resultados filtrados
+    }
+
+    // ====================================================================================
+    // GESTIÓN DE PRODUCTOS (Guardar, Editar, Eliminar)
+    // ====================================================================================
+    function guardarProducto() {
+        const id = productoIdInput.value;
+        const codigoBarra = codigoBarraInput.value.trim();
+        const nombre = nombreInput.value.trim();
+        const precio = parseFloat(precioInput.value);
+
+        if (!codigoBarra || !nombre || isNaN(precio) || precio < 0) {
+            alert('Por favor, complete todos los campos correctamente.');
+            return;
+        }
+
+        const nuevoProducto = {
+            id: id ? parseInt(id) : null, // ID solo si es una edición
+            codigoBarra: codigoBarra,
+            nombre: nombre,
+            precio: precio
+        };
+
+        let method = 'POST';
+        let url = '/productos';
+
+        if (id) {
+            // Si hay un ID, es una actualización (PUT)
+            method = 'PUT';
+            url = `/productos/${id}`;
+        }
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(nuevoProducto),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Si el servidor devuelve un error (ej. 409 Conflict por código de barras duplicado)
+                    return response.json().then(err => { throw new Error(err.message || `Error HTTP! estado: ${response.status}`); });
+                }
+                return response.json();
             })
-                .then(response => response.json())
-                .then(data => {
-                    alert("Producto actualizado");
-
-                })
-                .catch(err => {
-                    console.error("Error al guardar producto:", err);
-                });
-        }
+            .then(data => {
+                alert(`Producto ${id ? 'actualizado' : 'creado'} correctamente.`);
+                productoModal.hide(); // Cierra el modal
+                cargarProductos(); // Recarga la lista de productos para ver los cambios
+            })
+            .catch(error => {
+                console.error('Error al guardar el producto:', error);
+                alert(`Error al guardar el producto: ${error.message}`);
+            });
     }
 
     function eliminarProducto(codigoBarra) {
-        if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
-            fetch(`/productos/${codigoBarra}`, {
-                method: 'DELETE',
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert("Producto eliminado");
-                        // Actualiza la lista de productos
-                        productos = productos.filter(p => p.codigoBarra !== codigoBarra);
-                        mostrarPagina(paginaActual);
-                    } else {
-                        alert("Error al eliminar el producto.");
-                    }
-                })
-                .catch(err => {
-                    console.error("Error al eliminar producto:", err);
-                });
+        if (!confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción es irreversible.')) {
+            return;
         }
-    }
 
+        fetch(`/productos/${codigoBarra}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || `Error HTTP! estado: ${response.status}`); });
+                }
+                alert('Producto eliminado correctamente.');
+                cargarProductos(); // Recarga la lista de productos
+            })
+            .catch(error => {
+                console.error('Error al eliminar el producto:', error);
+                alert(`Error al eliminar el producto: ${error.message}`);
+            });
+    }
 </script>
 
 </body>

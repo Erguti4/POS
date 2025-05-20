@@ -3,287 +3,719 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Facturas</title>
+    <title>Facturas Registradas</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
 
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="/css/styles.css" />
-
-    <!-- jsPDF CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-
     <style>
+        /* Estilos generales del cuerpo */
         body {
-            background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
-            font-size: 1.3rem;
+            background-color: #eef1f5; /* Fondo gris claro consistente */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.95rem;
+            color: #333;
+            display: flex;
+            flex-direction: column; /* Organiza el contenido en columna */
+            justify-content: flex-start; /* Alinea el contenido al principio */
+            align-items: center; /* Centra horizontalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem; /* Padding general */
         }
 
-        h1, h3 {
-            font-weight: 700;
+        /* Contenedor principal de la aplicación */
+        .container-fluid {
+            width: 98%;
+            max-width: 1400px; /* Ancho máximo para el contenedor */
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 0.8rem; /* Bordes más redondeados */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+            margin-top: 1rem;
+        }
+
+        /* Título de la página */
+        h1 {
+            font-weight: bold;
+            color: #2c3e50; /* Color de encabezado consistente */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Controles de búsqueda y filtros */
+        .filter-controls {
+            background-color: #f8f9fa; /* Fondo claro para la sección de control */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+            display: flex;
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+            gap: 1rem; /* Espacio entre elementos */
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-controls label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 0.5rem;
+        }
+
+        .filter-controls input[type="date"],
+        .filter-controls input[type="text"] { /* Añadido para el input de texto */
+            padding: 0.6rem 1rem;
+            border-radius: 0.3rem;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+            flex-grow: 1; /* Permite que los inputs crezcan */
+            max-width: 250px; /* Ancho máximo para inputs de texto/fecha */
+        }
+
+        .filter-controls .btn-primary {
+            background-color: #3498db; /* Azul para el botón de aplicar filtro */
+            border-color: #3498db;
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+        .filter-controls .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .filter-controls .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        .filter-controls .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* Tabla de facturas */
+        .table-responsive {
+            margin-top: 2rem;
         }
 
         .table {
             border-collapse: separate;
             border-spacing: 0;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 0.8rem; /* Bordes redondeados para la tabla */
+            overflow: hidden; /* Asegura que los bordes redondeados se apliquen */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Sombra suave para la tabla */
+            background-color: #ffffff;
         }
 
-        .table thead th {
-            background-color: #4caf50;
-            color: #fff;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-bottom: 2px solid #e0e0e0;
+        .table thead {
+            background-color: #2c3e50; /* Azul oscuro para el encabezado de la tabla */
+            color: white;
+        }
+
+        .table th {
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap; /* Evita que el texto se rompa */
         }
 
         .table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f1f8e9;
-        }
-
-        .table tbody tr:nth-child(odd) {
-            background-color: #e8f5e9;
+            transition: background-color 0.2s ease;
         }
 
         .table tbody tr:hover {
-            background-color: #c8e6c9;
+            background-color: #f2f4f7; /* Color de fondo al pasar el ratón */
         }
 
         .table td {
-            text-align: center;
+            padding: 0.8rem 1.2rem;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.95rem;
+        }
+
+        /* Estilo para las filas impares de la tabla (cebreado) */
+        .table tbody tr:nth-child(odd) {
+            background-color: #fdfdfe; /* Blanco muy ligero */
+        }
+
+        /* Columna de acciones en la tabla */
+        .table td.actions-cell {
+            white-space: nowrap; /* Evita el salto de línea en los botones */
+            width: 1%; /* Intenta que la columna sea lo más pequeña posible */
+        }
+
+        .table td .btn {
+            padding: 0.4rem 0.7rem;
+            font-size: 0.85rem;
+            border-radius: 0.25rem;
+            margin-right: 0.3rem; /* Espacio entre botones */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .table td .btn:last-child {
+            margin-right: 0; /* Elimina el margen derecho del último botón */
+        }
+
+        .table td .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-info {
+            background-color: #3498db; /* Azul para ver detalle/imprimir */
+            border-color: #3498db;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c; /* Rojo para eliminar */
+            border-color: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        /* Estilos para el contenedor de productos expandible */
+        .productos-factura {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto; /* Permite scroll horizontal si los productos son muchos */
+        }
+        .productos-factura table {
+            width: 100%;
+            margin-bottom: 0;
+            background-color: #f8f9fa; /* Fondo más claro para la tabla interna */
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .productos-factura table thead th {
+            background-color: #6c757d; /* Gris oscuro para el encabezado de productos */
+            color: white;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }
+        .productos-factura table tbody td {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+        }
+        .productos-factura table tbody tr:nth-child(even) {
+            background-color: #eff2f6; /* Cebrado para productos */
+        }
+
+        /* Paginación */
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pagination-container .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.3rem;
+            font-size: 1rem;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            color: #333;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .pagination-container .btn:hover:not(.active) {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+        }
+
+        .pagination-container .btn.active {
+            background-color: #3498db; /* Azul para la página activa */
+            border-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Botón de "Volver a la caja" */
+        .back-to-caja-btn {
+            margin-top: 2rem;
+            background-color: #f8f9fa; /* Fondo claro */
+            border: 1px solid #ced4da; /* Borde suave */
+            color: #333; /* Texto oscuro */
             font-size: 1.1rem;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.75rem 2rem;
+            border-radius: 0.3rem;
+            text-decoration: none; /* Quitar subrayado del enlace */
+            display: inline-flex; /* Para alinear el icono y el texto */
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .back-to-caja-btn:hover {
+            background-color: #e9ecef;
+            color: #111;
+            border-color: #adb5bd;
+        }
+
+        /* Ajustes responsivos */
+        @media (max-width: 992px) {
+            .container-fluid {
+                padding: 1.5rem;
+            }
+            .table th, .table td {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .table td .btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-controls > div { /* Asegura que los contenedores de inputs ocupen todo el ancho */
+                width: 100%;
+            }
+            .filter-controls input[type="date"],
+            .filter-controls input[type="text"] {
+                max-width: 100%;
+            }
+            .filter-controls .btn-primary,
+            .filter-controls .btn-outline-secondary {
+                width: 100%;
+            }
+            .table td.actions-cell {
+                white-space: normal; /* Permite el salto de línea para que los botones se apilen */
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            .container-fluid {
+                padding: 1rem;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .table thead {
+                display: none; /* Oculta el encabezado de la tabla en móviles */
+            }
+            .table tbody, .table tr, .table td {
+                display: block; /* Hace que las filas y celdas se comporten como bloques */
+                width: 100%;
+            }
+            .table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                padding: 0.8rem;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            }
+            .table td {
+                text-align: right;
+                padding-left: 50%; /* Espacio para la etiqueta */
+                position: relative;
+                border: none;
+                padding-bottom: 0.5rem;
+                padding-top: 0.2rem;
+            }
+            .table td::before {
+                content: attr(data-label); /* Usa el atributo data-label como etiqueta */
+                position: absolute;
+                left: 0.8rem;
+                width: calc(50% - 1.2rem);
+                padding-right: 1rem;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            .table td.actions-cell {
+                text-align: center;
+                padding-left: 0;
+                margin-top: 0.5rem;
+                border-top: 1px dashed #eee;
+                display: flex; /* Para que los botones se centren y fluyan */
+                justify-content: center;
+                flex-wrap: wrap; /* Permitir que los botones se envuelvan */
+                gap: 0.5rem; /* Espacio entre botones */
+            }
+            .table td.actions-cell::before {
+                display: none; /* Oculta la etiqueta para la celda de acciones */
+            }
         }
     </style>
 </head>
-
 <body>
-<div class="container py-5">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg shadow-sm bg-light px-4 py-3 rounded mb-4">
-        <a class="navbar-brand d-flex align-items-center fs-2 fw-bold text-success" href="#">
-            <i class="bi bi-file-earmark-text me-2"></i> Facturas
-        </a>
-        <a href="javascript:history.back()" class="btn btn-primary ms-auto my-2 my-lg-0">
-            <i class="bi bi-arrow-left ms-2 fs-4"></i>
-        </a>
 
-    </nav>
+<div class="container-fluid animate__animated animate__fadeIn">
+    <h1 class="text-center mb-4">Facturas Registradas</h1>
 
-    <!-- Encabezado -->
-    <div class="text-center animate__animated animate__fadeIn animate__delay-1s">
-        <h1 class="display-3 mb-3">Gestión de Facturas</h1>
-        <p class="lead fs-4">Visualiza las facturas generadas y sus productos asociados.</p>
-    </div>
-
-    <!-- Filtro por fecha -->
-    <div class="mb-4 d-flex justify-content-end">
-        <label for="filtroFecha" class="me-2 fw-bold align-self-center">Filtrar por fecha:</label>
-        <input type="date" id="filtroFecha" class="form-control w-auto" />
-    </div>
-
-
-    <!-- Facturas -->
-    <div class="mt-5 animate__animated animate__fadeInUp">
-        <h3 class="mb-3">Lista de Facturas</h3>
-        <div class="table-responsive">
-            <table class="table table-hover border">
-                <thead>
-                <tr>
-                    <th>Factura ID</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Productos</th>
-                </tr>
-                </thead>
-                <tbody id="facturasLista">
-                <!-- Aquí se rellenarán las facturas dinámicamente -->
-                </tbody>
-            </table>
+    <div class="filter-controls animate__animated animate__fadeInDown">
+        <div>
+            <label for="buscarIdFactura">Buscar por ID:</label>
+            <input type="text" id="buscarIdFactura" class="form-control" placeholder="Ej. 0001">
         </div>
+        <div>
+            <label for="fechaInicio">Fecha Inicio:</label>
+            <input type="date" id="fechaInicio" class="form-control">
+        </div>
+        <div>
+            <label for="fechaFin">Fecha Fin:</label>
+            <input type="date" id="fechaFin" class="form-control">
+        </div>
+        <button class="btn btn-primary" onclick="filtrarFacturas()">
+            <i class="bi bi-funnel me-2"></i> Aplicar Filtro
+        </button>
+        <button class="btn btn-outline-secondary" onclick="resetearFiltros()">
+            <i class="bi bi-x-circle me-2"></i> Resetear
+        </button>
     </div>
 
-    <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-3">
-        <button id="prevPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 me-3 fs-3">←</button>
-        <button id="sigPagina" class="btn btn-outline-secondary btn-lg px-4 py-2 fs-3">→</button>
+    <div class="table-responsive animate__animated animate__fadeInUp">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>ID Factura</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="facturasTablaBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container" id="paginationControls">
+    </div>
+
+    <div class="text-center">
+        <a href="javascript:history.back()" class="btn back-to-caja-btn animate__animated animate__fadeInUp">
+            <i class="bi bi-arrow-left-circle me-2"></i> Volver
+        </a>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let facturas = [];
-    let paginaActual = 0;
-    const facturasPorPagina = 6;
-    let filtroFecha = null; // Nueva variable para el filtro
+    // ====================================================================================
+    // VARIABLES GLOBALES
+    // ====================================================================================
+    let todasLasFacturas = []; // Almacena todas las facturas cargadas del servidor
+    let facturasFiltradas = []; // Almacena las facturas después de aplicar filtros
+    let paginaActual = 0; // Controla la página actual de la tabla
+    const facturasPorPagina = 5; // Número de facturas a mostrar por página
 
-    document.addEventListener("DOMContentLoaded", () => {
-        fetch('/api/factura')  // Asegúrate de que este endpoint retorne las facturas con los productos asociados
-            .then(response => response.json())
-            .then(data => {
-                facturas = data;
-                mostrarPagina(paginaActual);
-            })
-            .catch(err => {
-                console.error("Error al cargar facturas:", err);
-            });
-
-        document.getElementById("prevPagina").addEventListener("click", () => {
-            if (paginaActual > 0) {
-                paginaActual--;
-                mostrarPagina(paginaActual);
-            }
-        });
-
-        document.getElementById("sigPagina").addEventListener("click", () => {
-            const totalPaginas = Math.ceil(facturas.length / facturasPorPagina);
-            if (paginaActual < totalPaginas - 1) {
-                paginaActual++;
-                mostrarPagina(paginaActual);
-            }
-        });
-
-        document.getElementById("filtroFecha").addEventListener("change", (event) => {
-            const valor = event.target.value;
-            filtroFecha = valor ? new Date(valor) : null;
-            paginaActual = 0;
-            mostrarPagina(paginaActual);
-        });
-
+    // ====================================================================================
+    // INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // ====================================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarFacturas(); // Carga todas las facturas al iniciar
+        document.getElementById('buscarIdFactura').addEventListener('input', filtrarFacturas); // Listener para búsqueda por ID
     });
 
+    // ====================================================================================
+    // CARGA DE FACTURAS DESDE EL SERVIDOR
+    // ====================================================================================
+    function cargarFacturas() {
+        fetch('/api/factura') // Endpoint para obtener todas las facturas (singular)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error HTTP! estado: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                todasLasFacturas = data; // Almacena todas las facturas
+                // Invertir el orden para mostrar las más recientes primero
+                todasLasFacturas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                filtrarFacturas(); // Aplica los filtros (inicialmente sin fechas y sin ID)
+            })
+            .catch(error => console.error('Error al cargar las facturas:', error));
+    }
+
+    // ====================================================================================
+    // FILTRADO DE FACTURAS POR RANGO DE FECHAS Y/O ID
+    // ====================================================================================
+    function filtrarFacturas() {
+        const fechaInicioStr = document.getElementById('fechaInicio').value;
+        const fechaFinStr = document.getElementById('fechaFin').value;
+        const idFacturaBuscado = document.getElementById('buscarIdFactura').value.trim();
+
+        // Convertir las fechas a objetos Date para comparación
+        // Se añade un día a fechaFin para incluir todo el día seleccionado
+        const fechaInicio = fechaInicioStr ? new Date(fechaInicioStr + 'T00:00:00') : null;
+        const fechaFin = fechaFinStr ? new Date(fechaFinStr + 'T23:59:59') : null;
+
+        facturasFiltradas = todasLasFacturas.filter(factura => {
+            const fechaFactura = new Date(factura.fecha); // Fecha de la factura
+
+            // Filtro por fecha
+            const cumpleFechaInicio = !fechaInicio || fechaFactura >= fechaInicio;
+            const cumpleFechaFin = !fechaFin || fechaFactura <= fechaFin;
+
+            // Filtro por ID de factura
+            const idMatch = idFacturaBuscado === '' || factura.id.toString().includes(idFacturaBuscado);
+
+            return cumpleFechaInicio && cumpleFechaFin && idMatch;
+        });
+
+        // Asegurarse de que facturasFiltradas esté ordenado por fecha de más reciente a más antigua
+        facturasFiltradas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        mostrarPagina(0); // Vuelve a la primera página con los resultados filtrados
+        generarControlesPaginacion(); // Regenera la paginación para los resultados filtrados
+    }
+
+    function resetearFiltros() {
+        document.getElementById('fechaInicio').value = '';
+        document.getElementById('fechaFin').value = '';
+        document.getElementById('buscarIdFactura').value = ''; // Resetear el campo de búsqueda por ID
+        filtrarFacturas(); // Vuelve a cargar todas las facturas sin filtros
+    }
+
+    // ====================================================================================
+    // PAGINACIÓN Y VISUALIZACIÓN DE LA TABLA
+    // ====================================================================================
     function mostrarPagina(pagina) {
-        const tabla = document.getElementById("facturasLista");
-        tabla.innerHTML = "";
+        paginaActual = pagina;
+        const tablaBody = document.getElementById('facturasTablaBody');
+        tablaBody.innerHTML = ''; // Limpia la tabla actual
 
         const inicio = pagina * facturasPorPagina;
         const fin = inicio + facturasPorPagina;
-        
-        const facturasFiltradas = filtroFecha
-            ? facturas.filter(f => {
-                const fechaFactura = new Date(f.fecha);
-                return fechaFactura.toDateString() === filtroFecha.toDateString();
-            })
-            : facturas;
+        const facturasPagina = facturasFiltradas.slice(inicio, fin); // Obtiene las facturas de la página actual
 
-        const totalPaginas = Math.ceil(facturasFiltradas.length / facturasPorPagina);
-        const facturasPagina = facturasFiltradas.slice(inicio, inicio + facturasPorPagina);
-
+        if (facturasPagina.length === 0) {
+            tablaBody.innerHTML = `<tr><td colspan="4" class="text-center py-4">No hay facturas para mostrar con los filtros aplicados.</td></tr>`;
+            return;
+        }
 
         facturasPagina.forEach((factura, index) => {
-            const row = document.createElement("tr");
+            const row = document.createElement('tr');
+            // Añadir clase de animación a cada fila con un ligero retraso
+            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index * 0.05}s`);
 
-            // Añadir clase de animación a cada fila con retraso
-            row.classList.add('animate__animated', 'animate__fadeInUp', `animate__delay-${index}s`);
+            const fechaFormateada = new Date(factura.fecha).toLocaleString('es-ES', {
+                year: 'numeric', month: 'numeric', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
 
-            const productos = factura.productos.map(producto => {
-                return `<tr>
-                            <td>${producto.nombre}</td>
-                            <td>${producto.precio}</td>
-                            <td>${producto.cantidad}</td>
-                        </tr>`;
+            // Construir la tabla de productos para mostrarla inline
+            const productosHtml = factura.productos.map(producto => {
+                const precioConDescuento = (parseFloat(producto.precio) * (1 - (parseFloat(producto.descuento) || 0) / 100)).toFixed(2);
+                const subtotal = (precioConDescuento * parseInt(producto.cantidad)).toFixed(2);
+                return `
+                    <tr>
+                        <td>${producto.nombre}</td>
+                        <td>${producto.cantidad}</td>
+                        <td>${parseFloat(producto.precio).toFixed(2)}€</td>
+                        <td>${(producto.descuento || 0)}%</td>
+                        <td>${subtotal}€</td>
+                    </tr>
+                `;
             }).join('');
 
-            // Formatear fecha con hora, minuto y segundo
-            const fecha = new Date(factura.fecha);
-            const fechaFormateada = `${fecha.toLocaleDateString()} ${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
-
             row.innerHTML = `
-                <td>${factura.id}</td>
-                <td>${fechaFormateada}</td>
-                <td>${factura.total.toFixed(2)}€</td>
-                <td>
-                    <button class="btn btn-info" onclick="verProductos(${factura.id})">Ver Productos</button>
-                    <button class="btn btn-success" onclick="imprimirFactura(${factura.id})">
+                <td data-label="ID Factura">${factura.id.toString().padStart(4, '0')}</td>
+                <td data-label="Fecha">${fechaFormateada}</td>
+                <td data-label="Total">${parseFloat(factura.total).toFixed(2)}€</td>
+                <td class="actions-cell">
+                    <button class="btn btn-info btn-sm" onclick="verProductos(${factura.id})">
+                        <i class="bi bi-eye"></i> Ver Productos
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="imprimirFactura(${factura.id})">
                         <i class="bi bi-printer"></i> Imprimir
                     </button>
-                    <div id="productosFactura${factura.id}" class="productos-factura" style="display: none;">
-                        <table class="table mt-3">
+                    <button class="btn btn-danger btn-sm" onclick="eliminarFactura(${factura.id})">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </td>
+            `;
+            tablaBody.appendChild(row);
+
+            // Fila adicional para los productos, inicialmente oculta
+            const productosRow = document.createElement('tr');
+            productosRow.id = `productosFacturaRow${factura.id}`;
+            productosRow.style.display = 'none'; // Oculta por defecto
+            productosRow.innerHTML = `
+                <td colspan="4">
+                    <div id="productosFactura${factura.id}" class="productos-factura">
+                        <h6 class="mb-3 text-center">Detalles de Productos de la Factura ${factura.id.toString().padStart(4, '0')}</h6>
+                        <table class="table table-bordered table-sm text-center">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Precio</th>
                                     <th>Cantidad</th>
+                                    <th>Precio/Ud.</th>
+                                    <th>Desc.</th>
+                                    <th>Subtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${productos}
+                                ${productosHtml}
                             </tbody>
                         </table>
                     </div>
                 </td>
             `;
-            tabla.appendChild(row);
+            tablaBody.appendChild(productosRow);
         });
+
+        generarControlesPaginacion(); // Regenera los controles de paginación
     }
 
+    function generarControlesPaginacion() {
+        const paginationContainer = document.getElementById('paginationControls');
+        paginationContainer.innerHTML = ''; // Limpia los controles actuales
+
+        const totalPaginas = Math.ceil(facturasFiltradas.length / facturasPorPagina);
+
+        // Botón "Anterior"
+        const btnPrev = document.createElement('button');
+        btnPrev.classList.add('btn', 'btn-secondary');
+        btnPrev.innerHTML = `<i class="bi bi-chevron-left"></i>`;
+        btnPrev.disabled = paginaActual === 0;
+        btnPrev.onclick = () => mostrarPagina(paginaActual - 1);
+        paginationContainer.appendChild(btnPrev);
+
+        // Números de página
+        const rango = 2; // Número de páginas a mostrar a cada lado de la actual
+        let startPage = Math.max(0, paginaActual - rango);
+        let endPage = Math.min(totalPaginas - 1, paginaActual + rango);
+
+        if (startPage > 0) {
+            const btnFirst = document.createElement('button');
+            btnFirst.classList.add('btn', 'btn-secondary');
+            btnFirst.textContent = 1;
+            btnFirst.onclick = () => mostrarPagina(0);
+            paginationContainer.appendChild(btnFirst);
+            if (startPage > 1) {
+                const dots = document.createElement('span');
+                dots.textContent = '...';
+                dots.classList.add('px-2');
+                paginationContainer.appendChild(dots);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const btnPage = document.createElement('button');
+            btnPage.classList.add('btn', 'btn-secondary');
+            btnPage.textContent = i + 1;
+            if (i === paginaActual) {
+                btnPage.classList.add('active'); // Marca la página actual como activa
+            }
+            btnPage.onclick = () => mostrarPagina(i);
+            paginationContainer.appendChild(btnPage);
+        }
+
+        if (endPage < totalPaginas - 1) {
+            if (endPage < totalPaginas - 2) {
+                const dots = document.createElement('span');
+                dots.textContent = '...';
+                dots.classList.add('px-2');
+                paginationContainer.appendChild(dots);
+            }
+            const btnLast = document.createElement('button');
+            btnLast.classList.add('btn', 'btn-secondary');
+            btnLast.textContent = totalPaginas;
+            btnLast.onclick = () => mostrarPagina(totalPaginas - 1);
+            paginationContainer.appendChild(btnLast);
+        }
+
+        // Botón "Siguiente"
+        const btnNext = document.createElement('button');
+        btnNext.classList.add('btn', 'btn-secondary');
+        btnNext.innerHTML = `<i class="bi bi-chevron-right"></i>`;
+        btnNext.disabled = paginaActual === totalPaginas - 1 || totalPaginas === 0;
+        btnNext.onclick = () => mostrarPagina(paginaActual + 1);
+        paginationContainer.appendChild(btnNext);
+    }
+
+    // ====================================================================================
+    // VER DETALLE DE PRODUCTOS (INLINE)
+    // ====================================================================================
     function verProductos(facturaId) {
-        const productosFactura = document.getElementById(`productosFactura${facturaId}`);
-        productosFactura.style.display = productosFactura.style.display === 'none' ? 'block' : 'none';
+        const productosFacturaRow = document.getElementById(`productosFacturaRow${facturaId}`);
+        if (productosFacturaRow) {
+            productosFacturaRow.style.display = productosFacturaRow.style.display === 'none' ? 'table-row' : 'none';
+        }
     }
 
-
-    async function imprimirFactura(facturaId) {
+    // ====================================================================================
+    // GENERACIÓN DE TICKET (PDF con jsPDF) - Reutilizada de caja.html
+    // ====================================================================================
+    async function imprimirFactura(idFactura) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const anchoPagina = doc.internal.pageSize.getWidth();
-        let y = 10;
+        let factura;
+        try {
+            const response = await fetch(`/api/factura/${idFactura}`); // Endpoint singular
+            if (!response.ok) throw new Error('Factura no encontrada para imprimir');
+            factura = await response.json();
+        } catch (error) {
+            console.error('Error al obtener factura para imprimir:', error);
+            alert('No se pudo obtener la factura para imprimir.');
+            return;
+        }
 
-        // Obtener la factura correspondiente
-        const factura = facturas.find(f => f.id === facturaId);
-        if (!factura) return;
-
-        const totalFactura = factura.total;
-        const productos = factura.productos;
-
-        // Obtener personalización
-        const personalizacion = await fetch('/ticket-personalizado')
-            .then(response => response.json())
-            .catch(error => {
-                console.error('Error al cargar la personalización:', error);
-                return {};
-            });
+        let personalizacion = {};
+        try {
+            const response = await fetch('/ticket-personalizado');
+            if (response.ok) personalizacion = await response.json();
+            else console.warn('No se pudo cargar la personalización del ticket.');
+        } catch (error) {
+            console.error('Error al cargar la personalización del ticket:', error);
+        }
 
         const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
-
         const fuente = fontType || "Helvetica";
         const tamanoFuente = fontSize || 12;
+        const anchoPagina = 200; // Ancho fijo del ticket en mm
+
+        // Calcular altura dinámica (ajustada para coincidir con generarTicket)
+        const alturaBase = 180; // Altura para encabezado, logo, info básica, etc.
+        const alturaPorProducto = 10; // Espacio para cada línea de producto
+        const margenInferior = 80; // Espacio aproximado para las condiciones y el pie
+        const alturaCalculada = alturaBase + (factura.productos ? factura.productos.length : 0) * alturaPorProducto + margenInferior;
+
+        const doc = new jsPDF({ unit: "mm", format: [anchoPagina, alturaCalculada] });
+        let y = 10; // Posición Y inicial
 
         doc.setFont(fuente, "normal");
         doc.setFontSize(tamanoFuente);
 
-        // Logo
+        // Añadir logo si está configurado
         if (logoUrl) {
             try {
                 const logoImg = await loadImage(logoUrl);
-                const logoAncho = 90;
-                const logoAlto = 60;
-                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
-                y += logoAlto + 10;
+                // Centrar imagen en el ancho de la página
+                doc.addImage(logoImg, 'JPEG', (anchoPagina - 180) / 2, y, 180, 60);
+                y += 60 + 10;
             } catch (error) {
-                console.error('Error al cargar el logo:', error);
+                console.error('Error al cargar el logo para el PDF:', error);
+                doc.text("Logo no disponible", anchoPagina / 2, y, { align: "center" });
+                y += 10;
             }
         }
 
-        // Texto personalizado
+        // Añadir texto personalizado
         if (customText) {
             const lineas = splitTextToLines(doc, customText, 180);
             lineas.forEach(linea => {
@@ -294,123 +726,141 @@
             y += 2;
         }
 
-        // Teléfono y NIF
-        doc.setFontSize(tamanoFuente + 2);
-        doc.setFont(undefined, "bold");
+        // Información de contacto y fiscal
+        doc.setFontSize(tamanoFuente + 2); doc.setFont(undefined, "bold");
         doc.text(`Telf.954 17 17 16`, 10, y);
-        doc.text(`NIF: 28742186-Y`, 130, y);
-        y += 20;
+        doc.text(`NIF: 28742186-Y`, 123, y);
+        y += 20; // Ajustado para coincidir con generarTicket
 
-        // Número de factura
-        doc.setFontSize(tamanoFuente + 15);
-        doc.setFont(undefined, "bold");
-        doc.text(`Factura Nº ${factura.id}`, 10, y);
+        // Título y número de factura
+        doc.setFontSize(tamanoFuente + 15); doc.setFont(undefined, "bold");
+        // Usar el ID de la factura cargada
+        doc.text(`Factura Nº ${factura.id.toString().padStart(4, '0')}`, 10, y);
         y += 8;
 
-        // Título
-        doc.setFontSize(tamanoFuente - 5);
-        doc.setFont(undefined, "normal");
+        doc.setFontSize(tamanoFuente - 5); doc.setFont(undefined, "normal");
         doc.text("FACTURA SIMPLIFICADA", 10, y);
 
-        // Fecha
-        if (showDate) {
-            const fecha = new Date(factura.fecha).toLocaleString();
-            doc.setFontSize(tamanoFuente - 1);
-            doc.setFont(undefined, "normal");
-            doc.text(`${fecha}`, 130, y);
+        // Fecha de la factura
+        if (showDate !== false) {
+            const fechaFactura = new Date(factura.fecha).toLocaleString('es-ES');
+            doc.setFontSize(tamanoFuente - 1); doc.setFont(undefined, "normal");
+            doc.text(`${fechaFactura}`, 125, y);
             y += 10;
-        }
+        } else { y += 10; }
 
-        // Encabezados de tabla
-        doc.setFontSize(tamanoFuente + 1);
-        doc.setFont(undefined, "bold");
+        // Encabezados de la tabla de productos
+        doc.setFontSize(tamanoFuente + 1); doc.setFont(undefined, "bold");
         doc.text("Producto", 10, y);
-        doc.text("Cant.", 90, y);
-        doc.text("Desc.", 120, y);
-        doc.text("Importe", 160, y);
-        doc.line(10, y + 2, anchoPagina - 10, y + 2);
+        doc.text("Cant.", 100, y, { align: "right" }); // Ajustado a 100
+        doc.text("Desc.", 140, y, { align: "right" }); // Ajustado a 140
+        doc.text("Importe", 190, y, { align: "right" }); // Ajustado a 190
+        doc.setFont(undefined, "normal");
+        doc.setLineWidth(0.1); doc.line(10, y + 2, anchoPagina - 10, y + 2);
         y += 10;
 
-        // Detalle de productos
-        doc.setFont(undefined, "normal");
-        productos.forEach(prod => {
-            const descuento = prod.descuento || 0;
-            const precioConDescuento = prod.precio * (1 - descuento / 100);
-            const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
-
-            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
+        // Listado de productos
+        factura.productos.forEach(prod => {
+            const descuento = parseFloat(prod.descuento) || 0;
+            const precio = parseFloat(prod.precio) || 0;
+            const cantidad = parseInt(prod.cantidad) || 0;
+            const precioConDescuento = precio * (1 - descuento / 100);
+            const totalProductoConDescuento = (precioConDescuento * cantidad).toFixed(2);
+            const nombreProductoVisual = prod.nombre.length > 35 ? prod.nombre.substring(0, 32) + "..." : prod.nombre;
             y += 4;
-            doc.text(nombre, 10, y);
-            doc.text(prod.cantidad.toString(), 100, y, { align: "right" });
-            doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
+            doc.text(nombreProductoVisual, 10, y);
+            doc.text(cantidad.toString(), 100, y, { align: "right" });
+            doc.text(descuento > 0 ? `${descuento.toFixed(0)}%` : "-", 140, y, { align: "right" });
             doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
             y += 7;
         });
 
-        doc.line(10, y, anchoPagina - 10, y);
+        // Línea después de los productos
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
         y += 20;
 
-        // Total final
-        doc.setFont(undefined, "bold");
-        doc.setFontSize(tamanoFuente + 15);
+        // Total
+        doc.setFont(undefined, "bold"); doc.setFontSize(tamanoFuente + 15);
         doc.text("TOTAL", 80, y);
-        doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
+        doc.text(`${parseFloat(factura.total).toFixed(2)}€`, 190, y, { align: "right" });
         y += 10;
-        doc.line(10, y, anchoPagina - 10, y);
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
 
-        // Base imponible e IVA
+        // Desglose de IVA
         const porcentajeIVA = 21;
-        const totalSinIVA = totalFactura / (1 + porcentajeIVA / 100);
-        const totalIVA = totalFactura - totalSinIVA;
+        const totalSinIVA = parseFloat(factura.total) / (1 + porcentajeIVA / 100);
+        const totalIVA = parseFloat(factura.total) - totalSinIVA;
         y += 10;
-
-        doc.setFontSize(tamanoFuente);
-        doc.setFont(undefined, "normal");
-        doc.text("Base imponible.", 80, y);
-        doc.text(`% IVA (${porcentajeIVA}%)`, 145, y);
+        doc.setFontSize(tamanoFuente); doc.setFont(undefined, "normal");
+        doc.text("Base imponible:", 80, y);
+        doc.text(`% IVA (${porcentajeIVA}%)`, 143, y);
         y += 10;
-
         doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
         doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
         y += 10;
-        doc.line(10, y, anchoPagina - 10, y);
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
         y += 10;
 
-        // Agradecimiento
-        doc.setFontSize(tamanoFuente - 1);
+        // Mensaje de agradecimiento y condiciones
+        doc.setFontSize(tamanoFuente - 1); doc.setFont(undefined, "normal");
         doc.text("GRACIAS POR SU COMPRA", anchoPagina / 2, y, { align: "center" });
         y += 8;
+        doc.setFontSize(tamanoFuente - 4);
+        const condiciones = [
+            "Ticket obligatorio para cambios (7 días después de la compra).",
+            "No se devuelve el dinero, se canjea por un vale de caja.",
+            "Garantía del producto según normativa vigente (24 MESES)."
+        ];
+        // Formato de condiciones para coincidir con generarTicket
+        condiciones.forEach(condicion => {
+            const lineasCondicion = splitTextToLines(doc, condicion, anchoPagina - 20);
+            lineasCondicion.forEach(linea => { doc.text(linea, 10, y); y += 4; });
+            y += 2;
+        });
 
-        // Condiciones
-        doc.setFontSize(tamanoFuente - 3);
-        doc.text("Ticket obligatorio para cambios de 7 días después de la compra", 10, y);
-        y += 8;
-        doc.text("No se devuelve  el   dinero, se   canjea   por   un   vale  de   caja", 10, y);
-        y += 8;
-        doc.text("Garantía del producto  según   normativa   vigente   24  MESES", 10, y);
-
-        // Abrir o guardar
-        doc.autoPrint();
-        window.open(doc.output('bloburl'), '_blank');
+        doc.autoPrint(); // Abre el diálogo de impresión automáticamente
+        window.open(doc.output('bloburl'), '_blank'); // Abre el PDF en una nueva pestaña
     }
 
+    // Función auxiliar para cargar imágenes (para el logo del ticket)
     function loadImage(url) {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => resolve(img);
-            img.onerror = reject;
+            img.onerror = (err) => reject(err);
             img.src = url;
         });
     }
 
+    // Función auxiliar para dividir texto en líneas (para adaptarse al ancho del ticket)
     function splitTextToLines(doc, text, maxWidth) {
         return doc.splitTextToSize(text, maxWidth);
     }
 
+    // ====================================================================================
+    // ELIMINAR FACTURA
+    // ====================================================================================
+    function eliminarFactura(idFactura) {
+        if (!confirm(`¿Está seguro de que desea eliminar la factura Nº ${idFactura.toString().padStart(4, '0')}? Esta acción es irreversible.`)) {
+            return;
+        }
 
-
-
+        fetch(`/api/factura/${idFactura}`, { // Endpoint singular
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error al eliminar la factura: ${response.status}`);
+                }
+                alert('Factura eliminada correctamente.');
+                cargarFacturas(); // Recarga la lista de facturas para actualizar la tabla
+            })
+            .catch(error => {
+                console.error('Error al eliminar la factura:', error);
+                alert(`No se pudo eliminar la factura: ${error.message}`);
+            });
+    }
 </script>
 
 </body>

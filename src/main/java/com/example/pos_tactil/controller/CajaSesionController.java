@@ -20,6 +20,13 @@ public class CajaSesionController {
         this.cajaSesionService = cajaSesionService;
     }
 
+    // Eliminar caja
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarCaja(@PathVariable Long id) {
+        cajaSesionService.eliminarCaja(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // Abrir caja
     @PostMapping("/abrir")
     public ResponseEntity<CajaSesion> abrirCaja() {

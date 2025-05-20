@@ -3,238 +3,360 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Caja POS</title>
+    <title>Caja POS - Nuevo Diseño</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"/>
 
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="/css/styles.css"/>
-
     <style>
-    body {
-        background: linear-gradient(to bottom right, #f2f6fc, #ffffff);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 1.2rem;
-        color: #2c3e50;
-    }
+        /* Estilos generales */
+        body {
+            background-color: #eef1f5; /* Un gris claro de fondo, similar a muchos POS */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.95rem; /* Ligeramente más pequeño para un look más denso */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio para scroll si es necesario */
+            min-height: 100vh;
+            padding-top: 1rem; /* Espacio en la parte superior */
+        }
 
-    .factura-panel {
-        background-color: #ffffff;
-        border-radius: 1rem;
-        padding: 2rem 2.5rem;
-        box-shadow: 0 8px 20px rgba(44, 62, 80, 0.15);
-        border: 1px solid #e3eaf3;
-        transition: all 0.3s ease;
-    }
+        .pos-container {
+            width: 95%;
+            max-width: 2000px; /* Ancho máximo para el POS */
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Para controlar el scroll interno si es necesario */
+            min-height: 85vh; /* Aumenta la altura mínima de la caja */
+        }
 
-    .factura-panel:hover {
-        box-shadow: 0 10px 30px rgba(44, 62, 80, 0.25);
-    }
+        /* Cabecera del POS */
+        .pos-header {
+            background-color: #2c3e50; /* Azul oscuro para la cabecera */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pos-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: white;
+        }
+        .pos-header .btn-view-invoices {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+        .pos-header .btn-view-invoices:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
 
-    h1, h3 {
-        color: #2c3e50;
-    }
+        /* Contenido Principal del POS (dos columnas) */
+        .pos-main-content {
+            display: flex;
+            flex-grow: 1; /* Para que ocupe el espacio disponible */
+        }
 
-    .btn-primary {
-        background-color: #2980b9;
-        border-color: #2980b9;
-    }
+        /* Columna Izquierda: Productos y escaneo */
+        .pos-left-column {
+            flex: 0 0 65%; /* Ocupa el 65% del ancho */
+            padding: 1.5rem;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .btn-primary:hover {
-        background-color: #2471a3;
-        border-color: #2471a3;
-    }
+        /* Columna Derecha: Total y Acciones */
+        .pos-right-column {
+            flex: 0 0 35%; /* Ocupa el 35% del ancho */
+            padding: 1.5rem;
+            background-color: #f8f9fa; /* Un fondo ligeramente diferente */
+            display: flex;
+            flex-direction: column;
+        }
 
-    .btn-success {
-        background-color: #27ae60;
-        border-color: #27ae60;
-    }
+        /* Estilos para el número de factura */
+        .invoice-number-section {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .invoice-number-section label {
+            font-weight: bold;
+            color: #555;
+        }
+        #numeroFactura {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            max-width: 100px;
+            text-align: center;
+            border-radius: 0.25rem;
+        }
 
-    .btn-success:hover {
-        background-color: #229954;
-        border-color: #229954;
-    }
+        /* Campo de escaneo */
+        .scan-area .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .scan-area #codigoBarraInput {
+            border-radius: 0.25rem 0 0 0.25rem;
+        }
+        .scan-area .btn-primary {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
 
-    .btn-outline-secondary {
-        border-color: #95a5a6;
-        color: #2c3e50;
-    }
+        /* Lista de productos */
+        .product-list-header {
+            font-weight: bold;
+            color: #2c3e50;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem; /* Ligeramente más pequeño */
+        }
+        .product-list-header .col-product { flex-basis: 50%; text-align: left;}
+        .product-list-header .col-qty { flex-basis: 10%; text-align: center;}
+        .product-list-header .col-price { flex-basis: 15%; text-align: center;}
+        .product-list-header .col-discount { flex-basis: 10%; text-align: center;}
+        .product-list-header .col-subtotal { flex-basis: 15%; text-align: right;}
 
-    .btn-outline-secondary:hover {
-        background-color: #bdc3c7;
-        color: #2c3e50;
-    }
+        #facturaItems {
+            flex-grow: 1; /* Para que la lista de productos ocupe el espacio */
+            overflow-y: auto; /* Scroll si hay muchos productos */
+            max-height: 400px; /* Altura máxima antes de scroll, ajustar según necesidad */
+            font-size: 0.9rem;
+        }
+        #facturaItems .product-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.5rem 0;
+            align-items: baseline;
+        }
+        #facturaItems .product-item:last-child {
+            border-bottom: none;
+        }
 
-    .table thead th {
-        background-color: #3498db;
-        color: white;
-        font-size: 1.05rem;
-        text-align: center;
-        border-bottom: 2px solid #2980b9;
-    }
-
-    .table tbody tr:nth-child(odd) {
-        background-color: #f7f9fb;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #ecf0f1;
-    }
-
-    .table td {
-        text-align: center;
-        padding: 0.75rem;
-        font-size: 1.05rem;
-    }
-
-    .table tbody tr:hover {
-        background-color: #d6eaf8;
-        transition: background-color 0.3s ease;
-    }
-
-    .total {
-        font-size: 2.2rem;
-        font-weight: bold;
-        margin-top: 2rem;
-        text-align: right;
-        color: #c0392b;
-    }
-
-    /* Campo: Cantidad */
-    .input-cantidad {
-        max-width: 60px;         
-        font-size: 0.9rem;       
-        padding: 0.3rem 0.3rem;  
-        text-align: center;
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-    }
-
-    /* Campo: Precio */
-    .input-precio {
-        max-width: 100px;         
-        font-size: 0.95rem;
-        padding: 0.3rem 0.5rem;
-        text-align: right;       
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-    }
-
-    /* Campo: Nombre */
-    .input-nombre {
-        max-width: 830px;
-        font-size: 1rem;      
-        padding: 0.3rem 0.5rem;
-        text-align: left;       
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-    }
-
-    /* Campo: Descuento */
-    .input-descuento {
-        max-width: 60px;
-        font-size: 0.85rem;      
-        padding: 0.3rem 0.5rem;
-        text-align: right;       
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-    }
+        /* Inputs dentro de la lista de productos */
+        .input-nombre, .input-cantidad, .input-precio, .input-descuento {
+            font-size: 1rem;
+            padding: 0.375rem 0.75rem; /* Standard Bootstrap 5 form-control padding for default size */
+            height: calc(1.5em + 0.75rem + 2px); /* Standard Bootstrap 5 form-control height */
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            box-shadow: none;
+            box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+        }
 
 
-    input[type="text"],
-    input[type="number"] {
-        transition: border-color 0.2s ease;
-    }
+        #facturaItems .btn-danger {
+            padding: 0.1rem 0.4rem; /* Botón de eliminar más pequeño */
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+        #facturaItems .product-item-subtotal {
+            font-weight: bold;
+            text-align: right;
+            padding-right: 5px; /* Alineación con el input de precio */
+        }
 
-    input[type="text"]:focus,
-    input[type="number"]:focus {
-        border-color: #3498db;
-        box-shadow: 0 0 0 0.15rem rgba(52, 152, 219, 0.25);
-        outline: none;
-    }
+        /* Sección de Total en la columna derecha */
+        .total-section {
+            background-color: #2c3e50; /* Fondo oscuro para el total */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.3rem;
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+        .total-section h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+        .total-section #totalFactura {
+            font-size: 2.8rem; /* Total bien grande */
+            font-weight: bold;
+        }
+        .total-section #totalFactura::after {
+            content: "€"; /* Añadir símbolo de euro */
+            font-size: 2rem;
+            margin-left: 0.25rem;
+        }
 
-    /* Botón rojo de eliminar */
-    .btn-danger {
-        background-color: #e74c3c;
-        border-color: #e74c3c;
-        font-weight: bold;
-    }
 
-    .btn-danger:hover {
-        background-color: #c0392b;
-        border-color: #c0392b;
-    }
+        /* Sección de Acciones en la columna derecha */
+        .actions-section h3 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.5rem;
+        }
+        .actions-section .btn {
+            width: 100%;
+            padding: 0.75rem; /* Botones más grandes y táctiles */
+            font-size: 1rem;
+            margin-bottom: 0.75rem; /* Espacio entre botones */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .actions-section .btn i {
+            margin-right: 0.5rem;
+        }
 
-</style>
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .btn-success:hover {
+            background-color: #229954;
+            border-color: #229954;
+        }
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #2c3e50;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* Modal: mantener estilos de Bootstrap o personalizarlos ligeramente si es necesario */
+        .modal-content {
+            border-radius: 0.3rem;
+        }
+        .modal-header {
+            background-color: #3498db;
+            color: white;
+        }
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* Ajustes responsivos si es necesario */
+        @media (max-width: 992px) { /* Para tablets y pantallas más pequeñas */
+            .pos-main-content {
+                flex-direction: column; /* Apilar columnas */
+            }
+            .pos-left-column, .pos-right-column {
+                flex: 1 0 auto; /* Ocupar todo el ancho disponible */
+                border-right: none;
+            }
+            .pos-right-column {
+                border-top: 1px solid #dee2e6;
+            }
+            #facturaItems {
+                max-height: 300px; /* Ajustar altura para pantallas pequeñas */
+            }
+        }
+        @media (max-width: 768px) {
+            .pos-header h1 {
+                font-size: 1.2rem;
+            }
+            .pos-header .btn-view-invoices {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .product-list-header {
+                font-size: 0.8rem;
+            }
+            #facturaItems .product-item {
+                font-size: 0.85rem;
+            }
+            .input-nombre, .input-cantidad, .input-precio, .input-descuento {
+                font-size: 0.8rem;
+            }
+            .total-section #totalFactura {
+                font-size: 2rem;
+            }
+            .actions-section .btn {
+                font-size: 0.9rem;
+                padding: 0.6rem;
+            }
+        }
+
+    </style>
 
 </head>
 <body>
-<div class="container py-5">
 
+<div class="pos-container">
+    <header class="pos-header">
+        <h1><i class="bi bi-shop me-2"></i>Caja Abierta</h1>
+        <a href="ver-facturas.html" class="btn btn-view-invoices">
+            <i class="bi bi-file-earmark-text me-1"></i> Ver Facturas
+        </a>
+    </header>
 
-    <!-- Encabezado -->
-    <div class="text-center mb-4 animate__animated animate__fadeInDown">
-        <h1 class="display-4">Caja Abierta</h1>
-        <p class="lead">Escanea productos o ingrésalos manualmente.</p>
+    <div class="pos-main-content">
+        <div class="pos-left-column">
+            <div class="invoice-number-section">
+                <label for="numeroFactura">Factura #</label>
+                <input type="text" id="numeroFactura" class="form-control d-inline-block" readonly>
+            </div>
 
-        <!-- Botón para ver todas las facturas -->
-            <a href="ver-facturas.html" class="btn btn-primary ms-3 my-2 my-lg-0">
-                <i class="bi bi-file-earmark-text me-2"></i> Ver Facturas
-            </a>
-    </div>
+            <div class="scan-area">
+                <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 0.75rem;">Agregar Producto</h3>
+                <div class="input-group">
+                    <label for="codigoBarraInput" class="visually-hidden">Código de Barras</label>
+                    <input type="text" id="codigoBarraInput" class="form-control form-control-lg" placeholder="Escanea o escribe el código de barras" autofocus>
+                    <button class="btn btn-primary btn-lg" onclick="buscarProducto()">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar
+                    </button>
+                </div>
+            </div>
 
-    <!-- Número de Factura -->
-    <div class="text-center mb-4 animate__animated animate__fadeInUp">
-        <label for="numeroFactura" class="h5">Factura #</label>
-        <input type="text" id="numeroFactura" class="form-control d-inline-block w-auto text-center" readonly style="font-size: 1.5rem; font-weight: bold; background-color: #f8f9fa;">
-    </div>
-
-    <!-- Panel de Factura -->
-    <div class="factura-panel animate__animated animate__fadeIn">
-        <h3>Productos en la Factura</h3>
-
-        <!-- Campo de escaneo / entrada -->
-        <div class="input-group mb-4">
-            <label for="codigoBarraInput"></label>
-            <input type="text" id="codigoBarraInput" class="form-control form-control-lg" placeholder="Escanea o escribe el código de barras" autofocus>
-            <button class="btn btn-primary btn-lg" onclick="buscarProducto()">
-                <i class="bi bi-plus-circle"></i> Agregar
-            </button>
+            <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 0.75rem;">Detalle de Factura</h3>
+            <div class="product-list-header d-flex">
+                <div class="col-product">Nombre</div>
+                <div class="col-qty">Unid</div>
+                <div class="col-price">Precio</div>
+                <div class="col-discount">Desc.</div>
+                <div class="col-subtotal">Importe</div>
+                <div style="flex-basis: 5%"></div> </div>
+            <div id="facturaItems">
+            </div>
         </div>
 
-        <div class="row fw-bold border-bottom pb-2">
-            <div class="col-8">Nombre</div>
-            <div class="col-1 text-end">Unid</div>
-            <div class="col-1 text-end">Precio</div>
-            <div class="col-1 text-center">Des</div>
-            <div class="col-1 text-end">Importe</div>
-        </div>
+        <div class="pos-right-column">
+            <div class="total-section">
+                <h3>Total a Pagar</h3>
+                <div id="totalFactura">0.00</div>
+            </div>
 
-        
-        <div id="facturaItems" class="mt-3"></div>
-
-        <!-- Total -->
-        <div class="total mt-4">Total: <span id="totalFactura">0.00</span>€</div>
-
-        <!-- Acciones -->
-        <div class="d-flex justify-content-between mt-5">
-            <button class="btn btn-outline-secondary btn-lg" onclick="cerrarCaja()">
-                <i class="bi bi-x-circle"></i> Cerrar Caja
-            </button>
-            <button class="btn btn-success btn-lg" onclick="finalizarFactura()">
-                <i class="bi bi-printer"></i> Imprimir
-            </button>
+            <div class="total-section">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Base Imponible:</span>
+                    <span id="baseImponible">0.00€</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span>IVA (21%):</span>
+                    <span id="ivaCalculado">0.00€</span>
+                </div>
+            </div>
+            <div class="actions-section">
+                <h3>Acciones</h3>
+                <button class="btn btn-success" onclick="finalizarFactura()">
+                    <i class="bi bi-printer"></i> Imprimir y Cobrar
+                </button>
+                <button class="btn btn-outline-secondary" onclick="cerrarCaja()">
+                    <i class="bi bi-x-circle"></i> Cerrar Caja
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal para crear producto -->
     <div class="modal" id="crearProductoModal" tabindex="-1" aria-labelledby="crearProductoModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -265,45 +387,54 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-    let numeroFactura = 0;  // Variable para almacenar el número de factura actual
+    // ====================================================================================
+    // VARIABLES GLOBALES Y CONFIGURACIÓN INICIAL
+    // ====================================================================================
+    let numeroFactura = 0;
+    let productos = [];
+    let dineroCajaActiva = 0;
 
+    // ====================================================================================
+    // MANEJO DEL NÚMERO DE FACTURA
+    // ====================================================================================
     function obtenerUltimoNumeroFactura() {
-        fetch('/api/factura/ultimo-id')  // Asegúrate de que esta URL devuelva el último número de factura
+        fetch('/api/factura/ultimo-id')
             .then(response => response.json())
             .then(data => {
-                numeroFactura = data.ultimoId + 1;  // Suponiendo que `ultimoId` es el número más alto
-                document.getElementById('numeroFactura').value = numeroFactura;  // Actualizar el campo de factura
+                numeroFactura = data.ultimoId + 1;
+                document.getElementById('numeroFactura').value = numeroFactura;
             })
             .catch(error => {
                 console.error('Error al obtener el último número de factura:', error);
-                numeroFactura = 1;  // Si hay error, empezamos desde 1
-                document.getElementById('numeroFactura').value = numeroFactura;  // Actualizar el campo de factura
+                numeroFactura = 1;
+                document.getElementById('numeroFactura').value = numeroFactura;
             });
     }
 
-    // Llamamos a la función para obtener el último ID al cargar la página
+    // ====================================================================================
+    // INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // ====================================================================================
     window.onload = function() {
         obtenerUltimoNumeroFactura();
-
         const guardado = localStorage.getItem('dineroCajaActiva');
         if (guardado !== null) {
             dineroCajaActiva = parseFloat(guardado);
         }
-    }
+    };
 
-    let productos = [];
-    
+    // ====================================================================================
+    // MANEJO DE PRODUCTOS (BÚSQUEDA, AGREGAR, CREAR)
+    // ====================================================================================
     document.getElementById('codigoBarraInput').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
-            e.preventDefault(); // Evita comportamiento por defecto si es necesario
+            e.preventDefault();
             buscarProducto();
         }
     });
-
 
     function buscarProducto() {
         const codigo = document.getElementById('codigoBarraInput').value.trim();
@@ -321,10 +452,10 @@
                     return;
                 }
                 agregarProductoAFactura(data.nombre, precio);
-                document.getElementById('codigoBarraInput').value = ''; // Limpiar el input
+                document.getElementById('codigoBarraInput').value = '';
             })
             .catch(() => {
-                // Mostrar modal para crear producto
+                document.getElementById('codigoProducto').value = codigo; // Pasar el código al modal
                 const modal = new bootstrap.Modal(document.getElementById('crearProductoModal'));
                 modal.show();
             });
@@ -336,7 +467,7 @@
         if (existente) {
             existente.cantidad += cantidad;
         } else {
-            productos.push({ nombre, precio, cantidad });
+            productos.push({ nombre, precio, cantidad, descuento: 0 });
         }
         actualizarFactura();
     }
@@ -346,7 +477,7 @@
         const precio = parseFloat(document.getElementById('precioProducto').value);
         const codigoBarra = document.getElementById('codigoProducto').value;
 
-        if (!nombre || isNaN(precio) || isNaN(codigoBarra)) {
+        if (!nombre || isNaN(precio) || !codigoBarra) {
             alert("Por favor, completa todos los campos correctamente.");
             return;
         }
@@ -354,188 +485,199 @@
         fetch("/productos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                codigoBarra: codigoBarra,
-                nombre: nombre,
-                precio: precio
-            })
+            body: JSON.stringify({ codigoBarra, nombre, precio })
         })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Error al crear el producto');
+                return res.json();
+            })
             .then(nuevoProducto => {
                 agregarProductoAFactura(nuevoProducto.nombre, nuevoProducto.precio);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('crearProductoModal'));
                 modal.hide();
-                document.getElementById('codigoBarraInput').value = ''; // Limpiar el input
+                document.getElementById('codigoBarraInput').value = '';
+                document.getElementById('nombreProducto').value = '';
+                document.getElementById('precioProducto').value = '';
+                // document.getElementById('codigoProducto').value = ''; // No limpiar el código por si se reusa o se quiere ver
             })
-            .catch(() => alert("Error al guardar el producto."));
+            .catch((error) => {
+                console.error("Error al guardar el producto:", error);
+                alert("Error al guardar el producto.");
+            });
     }
 
+    // ====================================================================================
+    // ACTUALIZACIÓN Y VISUALIZACIÓN DE LA FACTURA (MODIFICADO PARA NUEVO DISEÑO)
+    // ====================================================================================
     function actualizarFactura() {
         const contenedor = document.getElementById('facturaItems');
         const totalElem = document.getElementById('totalFactura');
-        contenedor.innerHTML = ''; // Limpiar la lista de productos
-
-        let total = 0;
+        const baseImponibleElem = document.getElementById('baseImponible'); // Get the new elements
+        const ivaCalculadoElem = document.getElementById('ivaCalculado');   // Get the new elements
+        contenedor.innerHTML = '';
+        let totalGeneralFactura = 0;
 
         productos.forEach((producto, index) => {
-            const descuento = producto.descuento || 0;
-            const precioConDescuento = producto.precio * (1 - descuento / 100);
-            const importe = precioConDescuento * producto.cantidad;
+            const descuento = parseFloat(producto.descuento) || 0;
+            const precioProducto = parseFloat(producto.precio) || 0;
+            const cantidadProducto = parseInt(producto.cantidad) || 0;
+            const precioConDescuento = precioProducto * (1 - descuento / 100);
+            const importeItem = precioConDescuento * cantidadProducto;
 
             const item = document.createElement('div');
-            item.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'border-bottom', 'py-2', 'gap-2');
+            item.classList.add('d-flex', 'product-item', 'gap-2');
             item.innerHTML = `
-            <input type="text" value="${producto.nombre}" class="form-control input-nombre" onblur="editarProducto(${index}, 'nombre', this.value)">
-            <input type="number" value="${producto.cantidad}" class="form-control input-cantidad" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)">
-            <input type="number" value="${producto.precio.toFixed(2)}" class="form-control input-precio" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)">
-            <input type="number" value="${(producto.descuento || 0)}" class="form-control input-descuento" min="0" max="100" step="0.01" onblur="editarProducto(${index}, 'descuento', this.value)">
-            <span class="text-end">${importe.toFixed(2)}€</span>    
-            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">×</button>
+            <div style="flex-basis: 50%;"><input type="text" value="${producto.nombre}" class="form-control input-nombre" onblur="editarProducto(${index}, 'nombre', this.value)"></div>
+            <div style="flex-basis: 10%;"><input type="number" value="${cantidadProducto}" class="form-control input-cantidad" min="1" onblur="editarProducto(${index}, 'cantidad', this.value)"></div>
+            <div style="flex-basis: 15%;"><input type="number" value="${precioProducto.toFixed(2)}" class="form-control input-precio" min="0" step="0.01" onblur="editarProducto(${index}, 'precio', this.value)"></div>
+            <div style="flex-basis: 10%;"><input type="number" value="${descuento.toFixed(2)}" class="form-control input-descuento" min="0" max="100" step="0.01" onblur="editarProducto(${index}, 'descuento', this.value)"></div>
+            <div style="flex-basis: 15%;" class="product-item-subtotal">${importeItem.toFixed(2)}€</div>
+            <div style="flex-basis: 5%; text-align: center;"><button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})"><i class="bi bi-trash"></i></button></div>
         `;
-
-
             contenedor.appendChild(item);
-            total += importe;
+            totalGeneralFactura += importeItem;
         });
 
-        totalElem.textContent = total.toFixed(2); // Actualizar el total
+        totalElem.textContent = totalGeneralFactura.toFixed(2);
+
+        // Calculate and display Base Imponible and IVA
+        const porcentajeIVA = 21; // Assuming 21% IVA based on your ticket generation logic
+        const baseImponible = totalGeneralFactura / (1 + porcentajeIVA / 100);
+        const ivaCalculado = totalGeneralFactura - baseImponible;
+
+        baseImponibleElem.textContent = `${baseImponible.toFixed(2)}€`;
+        ivaCalculadoElem.textContent = `${ivaCalculado.toFixed(2)}€`;
     }
 
-
     function editarProducto(index, campo, valor) {
-        if (campo === 'cantidad') {
-            valor = parseInt(valor);
-            if (isNaN(valor) || valor <= 0) return;
-            productos[index].cantidad = valor;
-        } else if (campo === 'precio') {
-            valor = parseFloat(valor);
-            if (isNaN(valor) || valor < 0) return;
-            productos[index].precio = valor;
-        } else if (campo === 'descuento') {
-            valor = parseFloat(valor);
-            if (isNaN(valor) || valor < 0 || valor > 100) return;
-            productos[index].descuento = valor;
-        } else if (campo === 'nombre') {
-            productos[index].nombre = valor;
+        if (index < 0 || index >= productos.length) return;
+        const producto = productos[index];
+        switch (campo) {
+            case 'cantidad':
+                const cantidadNum = parseInt(valor);
+                if (!isNaN(cantidadNum) && cantidadNum > 0) producto.cantidad = cantidadNum;
+                break;
+            case 'precio':
+                const precioNum = parseFloat(valor);
+                if (!isNaN(precioNum) && precioNum >= 0) producto.precio = precioNum;
+                break;
+            case 'descuento':
+                const descuentoNum = parseFloat(valor);
+                if (!isNaN(descuentoNum) && descuentoNum >= 0 && descuentoNum <= 100) producto.descuento = descuentoNum;
+                break;
+            case 'nombre':
+                if (typeof valor === 'string' && valor.trim() !== '') producto.nombre = valor.trim();
+                break;
+            default: return;
         }
         actualizarFactura();
     }
 
     function eliminarProducto(index) {
-    productos.splice(index, 1); // Quita el producto del array
-    actualizarFactura();        // Vuelve a renderizar la factura
+        if (index >= 0 && index < productos.length) {
+            productos.splice(index, 1);
+            actualizarFactura();
+        }
     }
 
-    let dineroCajaActiva = 0;
-
+    // ====================================================================================
+    // MANEJO DEL DINERO EN CAJA
+    // ====================================================================================
     function sumarDineroCajaActiva(monto) {
         dineroCajaActiva += monto;
         localStorage.setItem('dineroCajaActiva', dineroCajaActiva.toFixed(2));
     }
 
-    
-    function enviarFacturaAlBackend(productos, totalFactura) {
+    // ====================================================================================
+    // ENVÍO DE FACTURA AL BACKEND
+    // ====================================================================================
+    function enviarFacturaAlBackend(productosFactura, totalFacturaCalculado) {
         const data = {
-            productos: productos.map(producto => ({
-                nombre: producto.nombre,
-                precio: producto.precio,
-                cantidad: producto.cantidad,
-                descuento: producto.descuento
-            })),
-            total: totalFactura
+            productos: productosFactura.map(p => ({ nombre: p.nombre, precio: p.precio, cantidad: p.cantidad, descuento: p.descuento || 0 })),
+            total: totalFacturaCalculado
         };
-
         fetch('/api/factura/guardar', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al guardar la factura');
-                }
+                if (!response.ok) throw new Error('Error al guardar la factura');
                 return response.json();
             })
-            .then(data => {
-                console.log('Factura guardada con éxito:', data);
-            })
-            .catch(error => {
-                console.error('Hubo un error:', error);
-            });
+            .then(data => console.log('Factura guardada con éxito:', data))
+            .catch(error => console.error('Hubo un error al guardar la factura:', error));
     }
 
-
+    // ====================================================================================
+    // CIERRE DE CAJA
+    // ====================================================================================
     function cerrarCaja() {
         const totalCaja = dineroCajaActiva.toFixed(2);
+        if (!confirm(`¿Está seguro de que desea cerrar la caja con un total de ${totalCaja}€?`)) return;
 
-        fetch(`/api/caja/cerrar?totalVentas=${totalCaja}`, {
-            method: 'POST'
-        })
+        fetch(`/api/caja/cerrar?totalVentas=${totalCaja}`, { method: 'POST' })
             .then(response => {
                 if (response.ok) {
                     alert("Caja cerrada correctamente.");
                     dineroCajaActiva = 0;
-                    localStorage.removeItem('dineroCajaActiva'); // <== LIMPIAR
-                    window.location.href = "/"; 
+                    localStorage.removeItem('dineroCajaActiva');
+                    productos = [];
+                    actualizarFactura();
+                    obtenerUltimoNumeroFactura();
+                    window.location.href = "/"; // Opcional: redirigir
                 } else {
                     alert("Error al cerrar la caja.");
+                    response.text().then(text => console.error("Detalle del error al cerrar caja:", text));
                 }
             })
             .catch(err => {
-                console.error("Error al cerrar la caja:", err);
+                console.error("Error de red al cerrar la caja:", err);
                 alert("Error de red al cerrar la caja.");
             });
     }
 
-
-
-    async function generarTicket(productos, totalFactura) {
+    // ====================================================================================
+    // GENERACIÓN DE TICKET (PDF con jsPDF)
+    // ====================================================================================
+    async function generarTicket(productosFactura, totalFacturaCalculado) {
         const { jsPDF } = window.jspdf;
-        const alturaBase = 180; // Altura mínima
-        const alturaPorProducto = 10; // Altura media por producto
-        const margenInferior = 80; // Para totales, IVA, condiciones...
+        const alturaBase = 180;
+        const alturaPorProducto = 10;
+        const margenInferior = 80;
+        const alturaCalculada = alturaBase + productosFactura.length * alturaPorProducto + margenInferior;
+        const doc = new jsPDF({ unit: "mm", format: [200, alturaCalculada] });
 
-        const alturaCalculada = alturaBase + productos.length * alturaPorProducto + margenInferior;
-
-        const doc = new jsPDF({
-            unit: "mm",
-            format: [200, alturaCalculada], // Ticket: ancho fijo, altura variable
-        });
-
-        const personalizacion = await fetch('/ticket-personalizado')
-            .then(response => response.json())
-            .catch(error => {
-                console.error('Error al cargar la personalización:', error);
-                return {};
-            });
+        let personalizacion = {};
+        try {
+            const response = await fetch('/ticket-personalizado');
+            if (response.ok) personalizacion = await response.json();
+            else console.warn('No se pudo cargar la personalización del ticket.');
+        } catch (error) {
+            console.error('Error al cargar la personalización del ticket:', error);
+        }
 
         const { logoUrl, fontSize, fontType, showDate, customText } = personalizacion;
-
         const fuente = fontType || "Helvetica";
         const tamanoFuente = fontSize || 12;
         const anchoPagina = doc.internal.pageSize.getWidth();
         let y = 10;
-        
 
         doc.setFont(fuente, "normal");
         doc.setFontSize(tamanoFuente);
 
-        // Logo
         if (logoUrl) {
             try {
                 const logoImg = await loadImage(logoUrl);
-                const logoAncho = 180;
-                const logoAlto = 60;
-                doc.addImage(logoImg, 'JPEG', (anchoPagina - logoAncho) / 2, y, logoAncho, logoAlto);
-                y += logoAlto + 10;
+                doc.addImage(logoImg, 'JPEG', (anchoPagina - 180) / 2, y, 180, 60); // Ajustar tamaño logo si es necesario
+                y += 60 + 10;
             } catch (error) {
                 console.error('Error al cargar el logo:', error);
+                doc.text("Logo no disponible", anchoPagina / 2, y, { align: "center" });
+                y += 10;
             }
         }
 
-        // Texto personalizado
         if (customText) {
             const lineas = splitTextToLines(doc, customText, 180);
             lineas.forEach(linea => {
@@ -546,128 +688,96 @@
             y += 2;
         }
 
-        //Telefono y NIF
-        doc.setFontSize(tamanoFuente + 2);
-        doc.setFont(undefined, "bold");
+        doc.setFontSize(tamanoFuente + 2); doc.setFont(undefined, "bold");
         doc.text(`Telf.954 17 17 16`, 10, y);
-
-        doc.setFontSize(tamanoFuente + 2);
-        doc.setFont(undefined, "bold");
         doc.text(`NIF: 28742186-Y`, 123, y);
-
         y+= 20;
 
-        // Número de factura
-        doc.setFontSize(tamanoFuente + 15);
-        doc.setFont(undefined, "bold");
-        doc.text(`Factura Nº ${numeroFactura - 1}`, 10, y);
+        doc.setFontSize(tamanoFuente + 15); doc.setFont(undefined, "bold");
+        doc.text(`Factura Nº ${document.getElementById('numeroFactura').value}`, 10, y);
         y += 8;
 
-        // Título
-        doc.setFontSize(tamanoFuente - 5);
-        doc.setFont(undefined, "normal");
+        doc.setFontSize(tamanoFuente - 5); doc.setFont(undefined, "normal");
         doc.text("FACTURA SIMPLIFICADA", 10, y);
-        
 
-        // Fecha
-        if (showDate) {
-            const fecha = new Date().toLocaleString();
-            doc.setFontSize(tamanoFuente - 1);
-            doc.setFont(undefined, "normal");
+        if (showDate !== false) {
+            const fecha = new Date().toLocaleString('es-ES');
+            doc.setFontSize(tamanoFuente - 1); doc.setFont(undefined, "normal");
             doc.text(`${fecha}`, 125, y);
             y += 10;
-        }
+        } else { y += 10; }
 
-        // Encabezados
-        doc.setFontSize(tamanoFuente + 1);
-        doc.setFont(undefined, "bold");
+        doc.setFontSize(tamanoFuente + 1); doc.setFont(undefined, "bold");
         doc.text("Producto", 10, y);
-        doc.text("Cant.", 90, y);
-        doc.text("Desc.", 120, y);
-        doc.text("Importe", 160, y);
+        doc.text("Cant.", 100, y, { align: "right" });
+        doc.text("Desc.", 140, y, { align: "right" });
+        doc.text("Importe", 190, y, { align: "right" });
         doc.setFont(undefined, "normal");
-        doc.setLineWidth(0.1); // más fina que el valor por defecto
-        doc.line(10, y + 2, anchoPagina - 10, y + 2);
+        doc.setLineWidth(0.1); doc.line(10, y + 2, anchoPagina - 10, y + 2);
         y += 10;
-        
 
-        // Detalle productos
-        productos.forEach(prod => {
-            const descuento = prod.descuento || 0;
-            const precioConDescuento = prod.precio * (1 - descuento / 100);
-            const totalProductoConDescuento = (precioConDescuento * prod.cantidad).toFixed(2);
-
-            const nombre = prod.nombre.length > 20 ? prod.nombre.slice(0, 20) + "…" : prod.nombre;
-            const cantidad = prod.cantidad.toString();
+        productosFactura.forEach(prod => {
+            const descuento = parseFloat(prod.descuento) || 0;
+            const precio = parseFloat(prod.precio) || 0;
+            const cantidad = parseInt(prod.cantidad) || 0;
+            const precioConDescuento = precio * (1 - descuento / 100);
+            const totalProductoConDescuento = (precioConDescuento * cantidad).toFixed(2);
+            const nombreProductoVisual = prod.nombre.length > 35 ? prod.nombre.substring(0, 32) + "..." : prod.nombre;
             y += 4;
-
-            doc.text(nombre, 10, y);
-            doc.text(cantidad, 100, y, { align: "right" });
-            doc.text(descuento ? `${descuento}%` : "-", 140, y, { align: "right" });
+            doc.text(nombreProductoVisual, 10, y);
+            doc.text(cantidad.toString(), 100, y, { align: "right" });
+            doc.text(descuento > 0 ? `${descuento.toFixed(0)}%` : "-", 140, y, { align: "right" });
             doc.text(`${totalProductoConDescuento}€`, 190, y, { align: "right" });
             y += 7;
-
         });
 
-        doc.setLineWidth(0.1); // más fina que el valor por defecto
-        doc.line(10, y, anchoPagina - 10, y);
-
-        // Total final usando el que ya viene calculado
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
         y += 20;
-        doc.setFont(undefined, "bold");
-        doc.setFontSize(tamanoFuente + 15 );
+        doc.setFont(undefined, "bold"); doc.setFontSize(tamanoFuente + 15 );
         doc.text("TOTAL", 80, y);
-        doc.text(`${totalFactura.toFixed(2)}€`, 190, y, { align: "right" });
+        doc.text(`${totalFacturaCalculado.toFixed(2)}€`, 190, y, { align: "right" });
         y += 10;
-        doc.setLineWidth(0.1); // más fina que el valor por defecto
-        doc.line(10, y, anchoPagina - 10, y);
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
 
-        // Calcular base imponible e IVA (suponiendo IVA 21%)
         const porcentajeIVA = 21;
-        const totalSinIVA = totalFactura / (1 + porcentajeIVA / 100);
-        const totalIVA = totalFactura - totalSinIVA;
+        const totalSinIVA = totalFacturaCalculado / (1 + porcentajeIVA / 100);
+        const totalIVA = totalFacturaCalculado - totalSinIVA;
         y += 10;
-
-        // Encabezado IVA
-        doc.setFontSize(tamanoFuente);
-        doc.setFont(undefined, "normal");
-        doc.text("Base imponible.", 80, y);
+        doc.setFontSize(tamanoFuente); doc.setFont(undefined, "normal");
+        doc.text("Base imponible:", 80, y);
         doc.text(`% IVA (${porcentajeIVA}%)`, 143, y);
         y += 10;
-
-        // Textos iva
         doc.text(`${totalSinIVA.toFixed(2)}€`, 135, y, { align: "right" });
         doc.text(`${totalIVA.toFixed(2)}€`, 190, y, { align: "right" });
         y += 10;
-        doc.setLineWidth(0.1); // más fina que el valor por defecto
-        doc.line(10, y, anchoPagina - 10, y);
+        doc.setLineWidth(0.1); doc.line(10, y, anchoPagina - 10, y);
         y += 10;
 
-        // Agradecimiento
-        doc.setFontSize(tamanoFuente - 1);
-        doc.setFont(undefined, "normal");
+        doc.setFontSize(tamanoFuente - 1); doc.setFont(undefined, "normal");
         doc.text("GRACIAS POR SU COMPRA", anchoPagina / 2, y, { align: "center" });
         y += 8;
-
-        // Condiciones
         doc.setFontSize(tamanoFuente - 4);
-        doc.text("Ticket obligatorio para cambios de 7 días después de la compra", 10, y);
-        y += 8;
-        doc.text("No se devuelve  el   dinero, se   canjea   por   un   vale  de   caja", 10, y);
-        y += 8;
-        doc.text("Garantía del producto  según   normativa   vigente   24  MESES", 10, y);
+        const condiciones = [
+            "Ticket obligatorio para cambios (7 días después de la compra).",
+            "No se devuelve el dinero, se canjea por un vale de caja.",
+            "Garantía del producto según normativa vigente (24 MESES)."
+        ];
+        condiciones.forEach(condicion => {
+            const lineasCondicion = splitTextToLines(doc, condicion, anchoPagina - 20);
+            lineasCondicion.forEach(linea => { doc.text(linea, 10, y); y += 4; });
+            y += 2;
+        });
 
         doc.autoPrint();
         window.open(doc.output('bloburl'), '_blank');
     }
-
 
     function loadImage(url) {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => resolve(img);
-            img.onerror = reject;
+            img.onerror = (err) => reject(err);
             img.src = url;
         });
     }
@@ -676,41 +786,40 @@
         return doc.splitTextToSize(text, maxWidth);
     }
 
-
-    
-
-    function finalizarFactura() {
+    // ====================================================================================
+    // FINALIZACIÓN DE FACTURA
+    // ====================================================================================
+    async function finalizarFactura() {
         if (productos.length === 0) {
             alert("No hay productos en la factura.");
             return;
         }
-
-        // Calcular total
-        const totalFactura = productos.reduce((total, producto) => {
-            const precio = parseFloat(producto.precio) || 0;
-            const cantidad = parseFloat(producto.cantidad) || 0;
-            const descuento = parseFloat(producto.descuento) || 0;
+        const totalFacturaCalculado = productos.reduce((total, p) => {
+            const precio = parseFloat(p.precio) || 0;
+            const cantidad = parseFloat(p.cantidad) || 0;
+            const descuento = parseFloat(p.descuento) || 0;
             return total + (precio * (1 - descuento / 100)) * cantidad;
         }, 0);
 
-        // 1. Generar ticket
-        generarTicket(productos, totalFactura);
+        if (isNaN(totalFacturaCalculado)) {
+            alert("Error al calcular el total de la factura.");
+            return;
+        }
 
-        // 2. Sumar al total de la caja
-        sumarDineroCajaActiva(totalFactura);
-
-        // 3. Guardar la factura en la base de datos
-        enviarFacturaAlBackend(productos, totalFactura);
-
-        // 4. Limpiar productos y actualizar vista
-        productos = [];
-        actualizarFactura();
-
-        numeroFactura++;  // Incrementar el número de factura
-        document.getElementById('numeroFactura').value = numeroFactura;
+        try {
+            await generarTicket(productos, totalFacturaCalculado);
+            sumarDineroCajaActiva(totalFacturaCalculado);
+            enviarFacturaAlBackend(productos, totalFacturaCalculado);
+            productos = [];
+            actualizarFactura();
+            numeroFactura++;
+            document.getElementById('numeroFactura').value = numeroFactura;
+        } catch (error) {
+            console.error("Error al finalizar la factura:", error);
+            alert("Ocurrió un error al finalizar la factura: " + error.message);
+        }
     }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>

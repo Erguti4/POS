@@ -28,6 +28,16 @@ public class FacturaController {
         return facturaService.obtenerFacturas();
     }
 
+    @GetMapping("/{idFactura}")
+    public Factura obtenerFactura(@PathVariable Integer idFactura) {
+        return facturaService.obtenerFactura(idFactura);
+    }
+
+    @DeleteMapping("/{idFactura}")
+    public void eliminarFactura(@PathVariable Integer idFactura) {
+        facturaService.eliminarFactura(idFactura);
+    }
+
     // Nuevo endpoint para obtener el último ID de factura
     @GetMapping("/ultimo-id")
     public Map<String, Integer> obtenerUltimoIdFactura() {

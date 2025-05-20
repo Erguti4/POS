@@ -73,5 +73,8 @@ public class CajaSesionService {
         return cajaSesionRepository.findByEstado(CajaSesion.EstadoCaja.ABIERTA).isPresent();
     }
 
+    public void eliminarCaja(Long id) {
+        cajaSesionRepository.deleteById(id);
+    }
 }
 

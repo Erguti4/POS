@@ -66,4 +66,11 @@ public class FacturaService {
         return ids.isEmpty() ? null : ids.get(0); // Obtener el primer (y más grande) id
     }
 
+    public Factura obtenerFactura(Integer idFactura) {
+        return facturaRepository.findById(Long.valueOf(idFactura)).orElse(null);
+    }
+
+    public void eliminarFactura(Integer idFactura) {
+        facturaRepository.deleteById(Long.valueOf(idFactura));
+    }
 }
