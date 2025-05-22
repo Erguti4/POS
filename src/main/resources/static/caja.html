@@ -83,14 +83,18 @@
             flex-direction: column;
         }
 
-        /* Estilos para el número de factura */
+        /* Estilos para el número de factura y fecha/hora */
         .invoice-number-section {
             margin-bottom: 1rem;
             text-align: left;
+            display: flex; /* Usar flexbox para alinear elementos */
+            align-items: baseline; /* Alinea los elementos a la línea base de su texto */
+            gap: 1rem; /* Espacio entre los elementos */
         }
         .invoice-number-section label {
             font-weight: bold;
             color: #555;
+            white-space: nowrap; /* Evita que el texto de la etiqueta se rompa */
         }
         #numeroFactura {
             font-size: 1.2rem;
@@ -101,6 +105,12 @@
             text-align: center;
             border-radius: 0.25rem;
         }
+        #currentDateTime {
+            font-size: 2.4rem;
+            color: #666;
+            margin-left: auto; /* Empuja el elemento a la derecha */
+        }
+
 
         /* Campo de escaneo */
         .scan-area .input-group {
@@ -304,7 +314,7 @@
             <div class="invoice-number-section">
                 <label for="numeroFactura">Factura #</label>
                 <input type="text" id="numeroFactura" class="form-control d-inline-block" readonly>
-            </div>
+                <span id="currentDateTime"></span> </div>
 
             <div class="scan-area">
                 <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 0.75rem;">Agregar Producto</h3>
@@ -416,6 +426,24 @@
     }
 
     // ====================================================================================
+    // FUNCIÓN PARA ACTUALIZAR FECHA Y HORA
+    // ====================================================================================
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false // Formato de 24 horas
+        };
+        const dateTimeString = now.toLocaleString('es-ES', options);
+        document.getElementById('currentDateTime').textContent = dateTimeString;
+    }
+
+    // ====================================================================================
     // INICIALIZACIÓN AL CARGAR LA PÁGINA
     // ====================================================================================
     window.onload = function() {
@@ -424,6 +452,8 @@
         if (guardado !== null) {
             dineroCajaActiva = parseFloat(guardado);
         }
+        updateDateTime(); // Llamar a la función al cargar la página
+        setInterval(updateDateTime, 1000); // Actualizar cada segundo
     };
 
     // ====================================================================================
